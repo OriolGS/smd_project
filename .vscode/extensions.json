@@ -1,0 +1,14 @@
+{
+	"recommendations": [
+        "vscjava.vscode-java-pack",
+        "bernardoamorim7.javafx-css-support-vscode",
+        "shrey150.javafx-support",
+        "redhat.java",
+        "vscjava.vscode-maven",
+        "vscjava.vscode-java-dependency",
+        "AcademiaDosDevs.javafx",
+        "redhat.fabric8-analytics",
+		"bilalekrem.scenebuilderextension",
+        "GitHub.vscode-pull-request-github" 
+	]
+}

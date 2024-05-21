@@ -1,0 +1,27 @@
+# Proyecto Java con Interfaz Gráfica en JavaFX
+
+Este repositorio contiene un proyecto Java con una interfaz gráfica desarrollada utilizando JavaFX. El proyecto está configurado con Maven y puede ser importado y ejecutado en Visual Studio Code.
+
+## Requisitos Previos
+
+Asegúrate de tener instalado lo siguiente antes de comenzar:
+
+- [Java Development Kit (JDK)] https://download.oracle.com/java/21/latest/jdk-21_windows-x64_bin.exe
+
+- [Java version 21.0.2] https://download.oracle.com/java/21/archive/jdk-21.0.2_windows-x64_bin.exe
+
+- [Maven](https://maven.apache.org/download.cgi) instalado y configurado en tu sistema.
+
+- Dentro de .vscode tienes los id's de las extensiones recomendadas
+
+- Scene Builder: con esta aplicación puedes abrir y modificar las pantallas. Descargalo en: https://gluonhq.com/products/scene-builder/ y abre el fichero .fxml de src/main/resources
+
+## Instalación y Ejecución
+
+1. Clona este repositorio en tu máquina local:
+
+2. Abrelo en visual studio
+
+3. Ejecuta mvn clean install en la termina
+
+4. Ejecuta mvn javafx:run o usa el entorno de vsc: f1 y escribe: Tasks: Run Task
