@@ -7,15 +7,14 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {
-       @Override
+    @Override
     public void start(Stage primaryStage) throws Exception {
-        // Cargar el archivo FXML
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/Main.fxml"));
         Parent root = loader.load();
-        
-        // Configurar la escena
+        MainController controller = loader.getController();
+        controller.setPrimaryStage(primaryStage);
         Scene scene = new Scene(root, 640, 400);
-        primaryStage.setTitle("Mi Aplicación JavaFX");
+        primaryStage.setTitle("SMD Application");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
