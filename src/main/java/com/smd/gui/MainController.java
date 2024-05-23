@@ -3,6 +3,7 @@ package com.smd.gui;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 
 import com.smd.model.Component;
 
@@ -22,6 +23,7 @@ public class MainController {
     private Stage primaryStage;
     @FXML
     private Label wordName;
+
     @FXML
     private TableView componentsTable;
 
@@ -47,7 +49,7 @@ public class MainController {
     private TableColumn<Component, Boolean> flip;
 
     // ObservableList<Component> initialData() {
-    // Component c1 = new Component("Identifier1", "");
+    // Component c1 = new Component();
     // return FXCollections.<Component>observableArrayList(c1);
     // }
 
@@ -73,7 +75,11 @@ public class MainController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open File");
         File file = fileChooser.showOpenDialog(primaryStage);
-        if (file != null) {
+        if (!file.exists()) {
+            wordName.setText("No se ha encontrado el archivo");
+        } else if (file.length() == 0) {
+            wordName.setText("El archivo está vacío");
+        } else {
             openFile(file);
         }
     }
@@ -86,23 +92,7 @@ public class MainController {
 
         switch (fileExtension) {
             case ".txt":
-                try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                    String line = "";
-                    ArrayList<Component> components = new ArrayList<Component>();
-                    // TODO: montar un codi més bonic
-                    br.readLine();
-                    while ((line = br.readLine()) != null) {
-                        Component c = extractComponent(line);
-                        components.add(c);
-                    }
-                    components.removeLast();
-
-                    componentsTable.setItems(getData(components));
-
-                } catch (Exception e) {
-                    wordName.setText("El archivo " + file.getName() + " no se ha podido abrir correctamente.");
-                }
-
+                getTxtData(file);
                 break;
 
             case ".csv":
@@ -119,60 +109,55 @@ public class MainController {
 
     }
 
-    ObservableList<Component> getData(ArrayList<Component> components) {
-        return FXCollections.<Component>observableArrayList(components);
+    private void getTxtData(File file) {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line = "";
+            ArrayList<Component> components = new ArrayList<Component>();
+
+            // TODO: montar un codi més bonic
+            line = br.readLine();
+            if (line.trim().equals(".PARTS")) {
+                while ((line = br.readLine()) != null && !line.trim().equals(".ENDPARTS")) {
+                    components.add(extractComponent(line));
+                }
+
+                componentsTable.setItems(FXCollections.<Component>observableArrayList(components));
+
+            } else {
+                wordName.setText("Estructura de archivo inválida: se esperaba .PARTS");
+            }
+
+        } catch (IOException e) {
+            wordName.setText("No se ha podido leer bien el archivo");
+        } catch (SecurityException e) {
+            wordName.setText("Problema de seguridad al acceder al archivo");
+        }
     }
 
     private Component extractComponent(String line) {
+        String[] component = new String[7];
+
         String[] lineArray = line.split("  ");
-        String identifier = lineArray[0].trim();
+        component[0] = lineArray[0].trim();
+        String newLine = line;
 
-        // String rotation = lineArray[lineArray.length-1].trim();
-
-        lineArray = line.substring(identifier.length()).trim().split("  ");
-        String newLine = line.substring(identifier.length()).trim();
-        String type = lineArray[0].trim();
-
-        lineArray = newLine.substring(type.length()).trim().split("  ");
-        newLine = newLine.substring(type.length()).trim();
-        String outline = lineArray[0].trim();
-
-        lineArray = newLine.substring(outline.length()).trim().split("  ");
-        newLine = newLine.substring(outline.length()).trim();
-        String posX = (lineArray[0].trim());
-
-        lineArray = newLine.substring(posX.length()).trim().split("  ");
-        newLine = newLine.substring(posX.length()).trim();
-        String posY = (lineArray[0].trim());
-
-        lineArray = newLine.substring(posX.length()).trim().split(" ");
-        String rotation = "";
-        Boolean flip;
-        if (lineArray.length == 1) {
-            rotation = lineArray[0].trim();
-            flip = false;
-        } else {
-            rotation = lineArray[1].trim();
-            flip = true;
+        for (int i = 1; i < 5; i++) {
+            lineArray = newLine.substring(component[i - 1].length()).trim().split("  ");
+            newLine = newLine.substring(component[i - 1].length()).trim();
+            component[i] = lineArray[0].trim();
         }
 
-        // String[] posXLine = line.substring(beginIndex).trim().split(" ");
-        // beginIndex += posXLine[0].length();
-        // Float posX = Float.parseFloat(posXLine[0].trim());
-
-        // String[] posYLine = line.substring(beginIndex).trim().split(" ");
-        // beginIndex += posYLine[0].length();
-        // Float posY = Float.parseFloat(posYLine[0].trim());
-
-        // String[] rotationLine = line.substring(beginIndex).trim().split(" ");
-        // beginIndex += rotationLine[0].length();
-        // Float rotation = Float.parseFloat(rotationLine[0].trim());
-
-        // String[] flipLine = line.substring(beginIndex).trim().split(" ");
-        // beginIndex += flipLine[0].length();
-        // String flip = flipLine[0].trim();
-
-        Component c = new Component(identifier, 1, type, outline, posX, posY, rotation, flip);
+        lineArray = newLine.substring(component[4].length()).trim().split(" ");
+        Component c;
+        if (lineArray.length == 1) {
+            component[5] = lineArray[0].trim();
+            c = new Component(component[0], 1, component[1], component[2], component[3], component[4],
+                    component[5], false);
+        } else {
+            component[5] = lineArray[1].trim();
+            c = new Component(component[0], 1, component[1], component[2], component[3], component[4],
+                    component[5], true);
+        }
 
         return c;
     }

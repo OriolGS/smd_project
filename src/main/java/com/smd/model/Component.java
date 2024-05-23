@@ -13,16 +13,6 @@ public class Component {
     public Component() {
     }
 
-    public Component(String identifier, int boardFK, String type, String outline, String posX, String posY, String rotation) {
-        this.identifier = identifier;
-        this.boardFK = boardFK;
-        this.type = type;
-        this.outline = outline;
-        this.posX = posX;
-        this.posY = posY;
-        this.rotation = rotation;
-    }
-
     public Component(String identifier, int boardFK, String type, String outline, String posX, String posY,
             String rotation, Boolean flip) {
         this.identifier = identifier;
