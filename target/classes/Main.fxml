@@ -58,15 +58,15 @@
             <Font size="18.0" />
           </font>
         </Label>
-            <TableView fx:id="componentsTable" layoutY="40.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
+            <TableView fx:id="componentsTable" editable="true" layoutY="40.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="40.0">
               <columns>
                 <TableColumn fx:id="identifier" maxWidth="1.7976931348623157E308" prefWidth="98.0" text="Identificador" />
-                <!-- <TableColumn fx:id="type" maxWidth="1.7976931348623157E308" prefWidth="64.0" text="Tipo" />
-                  <TableColumn fx:id="outline" maxWidth="1.7976931348623157E308" prefWidth="81.0" text="Outline" />
-                  <TableColumn fx:id="posX" maxWidth="1.7976931348623157E308" prefWidth="88.0" text="Posición X" />
-                  <TableColumn fx:id="posY" maxWidth="1.7976931348623157E308" prefWidth="88.0" text="Posición Y" />
-                  <TableColumn fx:id="rotation" maxWidth="1.7976931348623157E308" text="Rotación" />
-                  <TableColumn fx:id="flip" maxWidth="1.7976931348623157E308" prefWidth="68.0" text="Flip" /> -->
+                <TableColumn fx:id="type" maxWidth="1.7976931348623157E308" prefWidth="64.0" text="Tipo" />
+                <TableColumn fx:id="outline" maxWidth="1.7976931348623157E308" prefWidth="81.0" text="Outline" />
+                <TableColumn fx:id="posX" maxWidth="1.7976931348623157E308" prefWidth="88.0" text="Posición X" />
+                <TableColumn fx:id="posY" maxWidth="1.7976931348623157E308" prefWidth="88.0" text="Posición Y" />
+                <TableColumn fx:id="rotation" maxWidth="1.7976931348623157E308" text="Rotación" />
+                <TableColumn fx:id="flip" maxWidth="1.7976931348623157E308" prefWidth="68.0" text="Flip" />
               </columns>
             </TableView>
       </children>

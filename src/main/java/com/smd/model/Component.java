@@ -5,20 +5,26 @@ public class Component {
     int boardFK;
     String type;
     String outline;
-    float posX;
-    float posY;
-    float rotation;
-    boolean flip;
+    String posX;
+    String posY;
+    String rotation;
+    Boolean flip;
 
     public Component() {
     }
 
-    public Component(String identifier) {
+    public Component(String identifier, int boardFK, String type, String outline, String posX, String posY, String rotation) {
         this.identifier = identifier;
+        this.boardFK = boardFK;
+        this.type = type;
+        this.outline = outline;
+        this.posX = posX;
+        this.posY = posY;
+        this.rotation = rotation;
     }
 
-    public Component(String identifier, int boardFK, String type, String outline, float posX, float posY,
-            float rotation, boolean flip) {
+    public Component(String identifier, int boardFK, String type, String outline, String posX, String posY,
+            String rotation, Boolean flip) {
         this.identifier = identifier;
         this.boardFK = boardFK;
         this.type = type;
@@ -61,35 +67,35 @@ public class Component {
         this.outline = outline;
     }
 
-    public float getPosX() {
+    public String getPosX() {
         return posX;
     }
 
-    public void setPosX(float posX) {
+    public void setPosX(String posX) {
         this.posX = posX;
     }
 
-    public float getPosY() {
+    public String getPosY() {
         return posY;
     }
 
-    public void setPosY(float posY) {
+    public void setPosY(String posY) {
         this.posY = posY;
     }
 
-    public float getRotation() {
+    public String getRotation() {
         return rotation;
     }
 
-    public void setRotation(float rotation) {
+    public void setRotation(String rotation) {
         this.rotation = rotation;
     }
 
-    public boolean isFlip() {
+    public Boolean isFlip() {
         return flip;
     }
 
-    public void setFlip(boolean flip) {
+    public void setFlip(Boolean flip) {
         this.flip = flip;
     }
 
