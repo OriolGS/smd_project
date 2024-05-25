@@ -52,16 +52,31 @@ public class CsvFileReader {
 
         while ((line = br.readLine()) != null) {
             String[] data = line.split(DELIMITER);
+            Component c;
+            if (data.length == 7) {
+                c = new Component(
+                        removeQuotes(data[0]),
+                        1,
+                        removeQuotes(data[1]),
+                        removeQuotes(data[2]),
+                        removeQuotes(data[3]),
+                        removeQuotes(data[4]),
+                        removeQuotes(data[5]),
+                        removeQuotes(data[6]).equals("bottom"));
 
-            Component c = new Component(
-                    removeQuotes(data[0]),
-                    1,
-                    removeQuotes(data[1]),
-                    removeQuotes(data[2]),
-                    removeQuotes(data[3]),
-                    removeQuotes(data[4]),
-                    removeQuotes(data[5]),
-                    data[6].equals("bottom"));
+            } else {
+                c = new Component(
+                        removeQuotes(data[0]),
+                        1,
+                        removeQuotes(data[1] + "," + data[2]),
+                        removeQuotes(data[3]),
+                        removeQuotes(data[4]),
+                        removeQuotes(data[5]),
+                        removeQuotes(data[6]),
+                        removeQuotes(data[7]).equals("bottom"));
+
+            }
+
             components.add(c);
         }
     }

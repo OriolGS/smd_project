@@ -5,16 +5,32 @@ public class Component {
     int boardFK;
     String type;
     String outline;
-    String posX;
-    String posY;
-    String rotation;
+    Float posX;
+    Float posY;
+    Float rotation;
     Boolean flip;
 
     public Component() {
     }
 
+    public Component(String outline) {
+        this.outline = outline;
+    }
+
     public Component(String identifier, int boardFK, String type, String outline, String posX, String posY,
             String rotation, Boolean flip) {
+        this.identifier = identifier;
+        this.boardFK = boardFK;
+        this.type = type;
+        this.outline = outline;
+        this.posX = Float.valueOf(posX.replace(',', '.'));
+        this.posY = Float.valueOf(posY.replace(',', '.'));
+        this.rotation = Float.valueOf(rotation.replace(',', '.'));
+        this.flip = flip;
+    }
+
+    public Component(String identifier, int boardFK, String type, String outline, Float posX, Float posY,
+            Float rotation, Boolean flip) {
         this.identifier = identifier;
         this.boardFK = boardFK;
         this.type = type;
@@ -57,27 +73,27 @@ public class Component {
         this.outline = outline;
     }
 
-    public String getPosX() {
+    public Float getPosX() {
         return posX;
     }
 
-    public void setPosX(String posX) {
+    public void setPosX(Float posX) {
         this.posX = posX;
     }
 
-    public String getPosY() {
+    public Float getPosY() {
         return posY;
     }
 
-    public void setPosY(String posY) {
+    public void setPosY(Float posY) {
         this.posY = posY;
     }
 
-    public String getRotation() {
+    public Float getRotation() {
         return rotation;
     }
 
-    public void setRotation(String rotation) {
+    public void setRotation(Float rotation) {
         this.rotation = rotation;
     }
 

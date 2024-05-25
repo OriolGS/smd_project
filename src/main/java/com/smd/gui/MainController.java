@@ -12,13 +12,17 @@ import com.smd.utils.TxtFileReader;
 import java.util.ArrayList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.css.converter.StringConverter;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.converter.*;
 
 public class MainController {
 
@@ -59,14 +63,25 @@ public class MainController {
     @FXML
     public void initialize() {
         this.wordName.setText("HOLA MUNDO");
+        identifier.setCellValueFactory(new PropertyValueFactory<>("identifier"));
+        type.setCellValueFactory(new PropertyValueFactory<>("type"));
+        outline.setCellValueFactory(new PropertyValueFactory<>("outline"));
+        posX.setCellValueFactory(new PropertyValueFactory<>("posX"));
+        posY.setCellValueFactory(new PropertyValueFactory<>("posY"));
+        rotation.setCellValueFactory(new PropertyValueFactory<>("rotation"));
+        flip.setCellValueFactory(new PropertyValueFactory<>("flip"));
 
-        identifier.setCellValueFactory(new PropertyValueFactory<Component, String>("identifier"));
-        type.setCellValueFactory(new PropertyValueFactory<Component, String>("type"));
-        outline.setCellValueFactory(new PropertyValueFactory<Component, String>("outline"));
-        posX.setCellValueFactory(new PropertyValueFactory<Component, Float>("posX"));
-        posY.setCellValueFactory(new PropertyValueFactory<Component, Float>("posY"));
-        rotation.setCellValueFactory(new PropertyValueFactory<Component, Float>("rotation"));
-        flip.setCellValueFactory(new PropertyValueFactory<Component, Boolean>("flip"));
+        // Hacer las columnas editables
+        identifier.setCellFactory(TextFieldTableCell.forTableColumn());
+        // ...
+        identifier.setCellFactory(TextFieldTableCell.forTableColumn());
+        type.setCellFactory(TextFieldTableCell.forTableColumn());
+        outline.setCellFactory(TextFieldTableCell.forTableColumn());
+        posX.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
+        posY.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
+        rotation.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
+        flip.setCellFactory(TextFieldTableCell.forTableColumn(new BooleanStringConverter()));
+
         // componentsTable.setItems(initialData());
     }
 

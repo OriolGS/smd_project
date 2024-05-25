@@ -28,28 +28,27 @@ Asegúrate de tener instalado lo siguiente antes de comenzar:
 
 ## Tareas a hacer:
 *Sin orden*
-1. Conectar a base de datos con hibernate
 
-2. Crear botón para guardar información a base de datos
+- Habilitar guardar a base de datos con hibernate
 
-3. Detectar si una placa ya está en la base de datos o no
+- Crear botón para guardar información a base de datos
 
-4. Modificar los datos de las tablas (estén o no en la bbdd)
+- Detectar si una placa ya está en la base de datos o no
 
-5. Centrar componentes
+- Centrar componentes
 
-6. Girar placa
+- Girar placa
 
-7. Cargar / recargar base de datos
+- Cargar / recargar base de datos
 
-8. Exportar info de la base de datos en .csv y .asq
+- Exportar info de la base de datos en .csv y .asq
 
-9. Imprimir datos de la tabla
+- Imprimir datos de la tabla
 
-10. Cargar base de datos (mirar si tenemos que hacerlo)
+- Cargar base de datos (mirar si tenemos que hacerlo)
 
-11. Crear manual
+- Crear manual
 
-12. Crear tutoriales
+- Crear tutoriales
 
-13. Crear about 
+- Crear about 
