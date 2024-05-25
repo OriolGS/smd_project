@@ -1,5 +1,9 @@
 package com.smd.model;
 
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+
 public class Component {
     String identifier;
     int boardFK;
@@ -103,6 +107,20 @@ public class Component {
 
     public void setFlip(Boolean flip) {
         this.flip = flip;
+    }
+
+    public Node getNode() {
+        VBox vbox = new VBox();
+        vbox.getChildren().addAll(
+            new Label("Identifier: " + identifier),
+            new Label("Type: " + type),
+            new Label("Outline: " + outline),
+            new Label("Position X: " + posX),
+            new Label("Position Y: " + posY),
+            new Label("Rotation: " + rotation),
+            new Label("Flip: " + flip)
+        );
+        return vbox;
     }
 
 }

@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.smd.gui.MainController;
 import com.smd.model.Component;
 
 import javafx.collections.FXCollections;
@@ -20,6 +21,7 @@ public class TxtFileReader {
     public static void read(File file, Label wordName, TableView<Component> componentsTable) {
         BufferedReader br = null;
         String line = "";
+        MainController.components.clear();
 
         try {
             br = new BufferedReader(new FileReader(file));
@@ -31,7 +33,7 @@ public class TxtFileReader {
                     extractComponent(line);
                 }
 
-                componentsTable.setItems(FXCollections.observableArrayList(components));
+                componentsTable.setItems(FXCollections.observableArrayList(MainController.components));
 
             } else {
                 wordName.setText("Estructura de archivo inválida: debe empezar con .PARTS");
@@ -73,6 +75,6 @@ public class TxtFileReader {
                     data[1].trim(), true);
         }
 
-        components.add(c);
+        MainController.components.add(c);
     }
 }

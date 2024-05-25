@@ -20,7 +20,7 @@
           <items>
             <MenuItem mnemonicParsing="false" onAction="#handleOpen" text="Open…" />
             <MenuItem mnemonicParsing="false" text="Export" />
-            <MenuItem mnemonicParsing="false" text="Print" />
+            <MenuItem mnemonicParsing="false" text="Print" onAction="#printTable"/>
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Setup">

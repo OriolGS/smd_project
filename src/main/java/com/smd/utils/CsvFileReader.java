@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.smd.gui.MainController;
 import com.smd.model.Component;
 
 import javafx.collections.FXCollections;
@@ -19,7 +20,7 @@ public class CsvFileReader {
 
     public static void read(File file, Label wordName, TableView<Component> componentsTable) {
         BufferedReader br = null;
-
+        MainController.components.clear();
         try {
             br = new BufferedReader(new FileReader(file));
 
@@ -27,7 +28,7 @@ public class CsvFileReader {
 
                 extractComponents(br);
 
-                componentsTable.setItems(FXCollections.<Component>observableArrayList(components));
+                componentsTable.setItems(FXCollections.<Component>observableArrayList(MainController.components));
 
             } else {
                 wordName.setText("Estructura de archivo inválida.");
@@ -77,7 +78,7 @@ public class CsvFileReader {
 
             }
 
-            components.add(c);
+            MainController.components.add(c);
         }
     }
 

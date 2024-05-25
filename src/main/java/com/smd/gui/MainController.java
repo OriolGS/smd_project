@@ -14,6 +14,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.converter.StringConverter;
 import javafx.fxml.FXML;
+import javafx.print.PrinterJob;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -54,6 +56,8 @@ public class MainController {
 
     @FXML
     private TableColumn<Component, Boolean> flip;
+
+    public static ArrayList<Component> components = new ArrayList<>();
 
     // ObservableList<Component> initialData() {
     // Component c1 = new Component();
@@ -101,6 +105,17 @@ public class MainController {
             wordName.setText("El archivo está vacío");
         } else {
             openFile(file);
+        }
+    }
+
+    @FXML
+    private void printTable() {
+        PrinterJob printerJob = PrinterJob.createPrinterJob();
+        if (printerJob != null && printerJob.showPrintDialog(primaryStage)) {
+            for (Component component : components) {
+                printerJob.printPage(component.getNode());
+            }
+            printerJob.endJob();
         }
     }
 
