@@ -9,26 +9,26 @@ import com.smd.model.Component;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
-public class AsqWriter {
-    private static final String HASH = "#";
+public class CsvWriter {
+    private static final String COLUMNS_HEADER = "Designator,NozzleNum,StackNum,Mid X,Mid";
     private static final String SEPARATOR = ",";
-    private static final String CHUCK = HASH + "PXY" + HASH + SEPARATOR;
-    private static final String FILE_NAME = "production1Maquina1.asq";
-    private static String asqText = "";
+    private static final String FILE_NAME = "production1Maquina2.csv";
+    private static String csvText;
 
     public static void generate(ArrayList<Component> components) {
-        for (Component c : components) {
-            asqText += HASH + c.getIdentifier() + HASH + SEPARATOR + c.getPosX() + SEPARATOR + " " + c.getPosY() + " "
-                    + c.getRotation() + SEPARATOR + CHUCK + HASH + HASH + SEPARATOR + HASH + c.getType() + " "
-                    + c.getOutline() + " " + HASH + "1,T,#1#,0,F,#TAPE#,#X#,#" + c.isFlip() + "#,##,##,F";
+        csvText = COLUMNS_HEADER;
+        csvText += "\n";
 
-            asqText += "\n";
+        for (Component c : components) {
+            csvText += c.getIdentifier() + SEPARATOR + "1/2,1," + c.getPosX() + SEPARATOR + c.getPosY() + SEPARATOR
+                    + c.getRotation() + ",0,100,None,VERDADERO, " + c.getType() + " " + c.getOutline();
+            csvText += "\n";
         }
 
         FileWriter fw = null;
         try {
             fw = new FileWriter(FILE_NAME);
-            fw.write(asqText);
+            fw.write(csvText);
             fw.close();
 
             Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -46,4 +46,5 @@ public class AsqWriter {
             alert.show();
         }
     }
+
 }

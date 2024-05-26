@@ -27,7 +27,8 @@ Asegúrate de tener instalado lo siguiente antes de comenzar:
 4. Ejecuta mvn javafx:run o usa el entorno de vsc: f1 y escribe: Tasks: Run Task
 
 ## Tareas a hacer:
-*Sin orden*
+
+Relacionado con bbdd:
 
 - Habilitar guardar a base de datos con hibernate
 
@@ -36,6 +37,11 @@ Asegúrate de tener instalado lo siguiente antes de comenzar:
 - Detectar si una placa ya está en la base de datos o no
 
 - Cargar / recargar base de datos
+
+- Cargar otra base de datos (mirar si tenemos que hacerlo)
+
+
+Otras funcionalidades:
 
 - Centrar componentes
 
@@ -47,8 +53,8 @@ Asegúrate de tener instalado lo siguiente antes de comenzar:
 
 - Mirar si cambiar la forma en la que se imprimen los componentes
 
-- Cargar base de datos (mirar si tenemos que hacerlo)
 
+Funcionalidades de info:
 - Crear manual
 
 - Crear tutoriales

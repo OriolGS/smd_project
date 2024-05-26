@@ -8,6 +8,7 @@ import java.io.IOException;
 import com.smd.model.Component;
 import com.smd.utils.AsqWriter;
 import com.smd.utils.CsvFileReader;
+import com.smd.utils.CsvWriter;
 import com.smd.utils.TxtFileReader;
 
 import java.util.ArrayList;
@@ -151,7 +152,7 @@ public class MainController {
 
     @FXML
     private void exportToCsv() {
-        AsqWriter.generate(components);
+        CsvWriter.generate(components);
     }
 
 }
