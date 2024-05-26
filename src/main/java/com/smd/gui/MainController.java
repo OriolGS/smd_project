@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import com.smd.model.Component;
+import com.smd.utils.AsqWriter;
 import com.smd.utils.CsvFileReader;
 import com.smd.utils.TxtFileReader;
 
@@ -141,6 +142,16 @@ public class MainController {
             default:
                 break;
         }
+    }
+
+    @FXML
+    private void exportToAsq() {
+        AsqWriter.generate(components);
+    }
+
+    @FXML
+    private void exportToCsv() {
+        AsqWriter.generate(components);
     }
 
 }

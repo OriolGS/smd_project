@@ -19,8 +19,13 @@
         <Menu mnemonicParsing="false" text="File">
           <items>
             <MenuItem mnemonicParsing="false" onAction="#handleOpen" text="Open…" />
-            <MenuItem mnemonicParsing="false" text="Export" />
-            <MenuItem mnemonicParsing="false" text="Print" onAction="#printTable"/>
+                  <Menu mnemonicParsing="false" text="Export...">
+                    <items>
+                  <MenuItem mnemonicParsing="false" onAction="#exportToAsq" text="to .asq" />
+                      <MenuItem mnemonicParsing="false" onAction="#exportToCsv" text="to .csv" />
+                    </items>
+                  </Menu>
+            <MenuItem mnemonicParsing="false" onAction="#printTable" text="Print" />
           </items>
         </Menu>
         <Menu mnemonicParsing="false" text="Setup">

@@ -35,13 +35,15 @@ Asegúrate de tener instalado lo siguiente antes de comenzar:
 
 - Detectar si una placa ya está en la base de datos o no
 
+- Cargar / recargar base de datos
+
 - Centrar componentes
 
 - Girar placa
 
-- Cargar / recargar base de datos
+- Exportar info de la base de datos en .csv
 
-- Exportar info de la base de datos en .csv y .asq
+- Añadir funcionalidad de directorio en el que exportar
 
 - Mirar si cambiar la forma en la que se imprimen los componentes
 
