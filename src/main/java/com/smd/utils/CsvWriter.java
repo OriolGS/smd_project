@@ -12,6 +12,7 @@ import javafx.scene.control.Alert.AlertType;
 public class CsvWriter {
     private static final String COLUMNS_HEADER = "Designator,NozzleNum,StackNum,Mid X,Mid";
     private static final String SEPARATOR = ",";
+    // TODO: cambiar cómo se consigue el nombre del archivo
     private static final String FILE_NAME = "production1Maquina2.csv";
     private static String csvText;
 

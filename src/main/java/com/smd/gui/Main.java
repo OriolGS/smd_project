@@ -11,12 +11,19 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/Main.fxml"));
         Parent root = loader.load();
-        //MainController controller = loader.getController();
-        //controller.setPrimaryStage(primaryStage);
+
         Scene scene = new Scene(root, 640, 400);
         primaryStage.setTitle("SMD Application");
         primaryStage.setScene(scene);
+
+        primaryStage.setMaximized(true);
+
         primaryStage.show();
+
+        primaryStage.setOnCloseRequest(event -> {
+            // TODO: mirar si hay que controlar algo más
+            MainController.closeDataBase();
+        });
     }
 
     public static void main(String[] args) {

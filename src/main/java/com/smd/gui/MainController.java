@@ -1,11 +1,6 @@
 package com.smd.gui;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-
-import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
 import com.smd.model.Board;
 import com.smd.model.Component;
 import com.smd.utils.AsqWriter;
@@ -26,8 +21,6 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.css.converter.StringConverter;
 import javafx.fxml.FXML;
 import javafx.print.PrinterJob;
 import javafx.scene.control.Label;
@@ -41,11 +34,13 @@ import javafx.util.converter.*;
 
 public class MainController {
 
+    private Stage primaryStage;
+
     private static Configuration configuration;
     private static SessionFactory sessionFactory;
     private static Session session;
 
-    private Stage primaryStage;
+    public static ArrayList<Component> components = new ArrayList<>();
 
     @FXML
     private Label wordName;
@@ -74,16 +69,10 @@ public class MainController {
     @FXML
     private TableColumn<Component, Boolean> flip;
 
-    public static ArrayList<Component> components = new ArrayList<>();
-
-    // ObservableList<Component> initialData() {
-    // Component c1 = new Component();
-    // return FXCollections.<Component>observableArrayList(c1);
-    // }
-
     @FXML
     public void initialize() {
-        this.wordName.setText("HOLA MUNDO");
+        this.wordName.setText("Bienvenido");
+
         identifier.setCellValueFactory(new PropertyValueFactory<>("identifier"));
         type.setCellValueFactory(new PropertyValueFactory<>("type"));
         outline.setCellValueFactory(new PropertyValueFactory<>("outline"));
@@ -92,7 +81,7 @@ public class MainController {
         rotation.setCellValueFactory(new PropertyValueFactory<>("rotation"));
         flip.setCellValueFactory(new PropertyValueFactory<>("flip"));
 
-        // Hacer las columnas editables
+        // Hace las columnas editables
         identifier.setCellFactory(TextFieldTableCell.forTableColumn());
         type.setCellFactory(TextFieldTableCell.forTableColumn());
         outline.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -100,92 +89,12 @@ public class MainController {
         posY.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
         rotation.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
         flip.setCellFactory(TextFieldTableCell.forTableColumn(new BooleanStringConverter()));
+        
         startDataBase();
         loadInfoFromDataBase();
-
-        // componentsTable.setItems(initialData());
     }
 
-    @FXML
-    private void handleOpen() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open File");
-        File file = fileChooser.showOpenDialog(primaryStage);
-        if (file == null || !file.exists()) {
-            wordName.setText("No se ha encontrado el archivo");
-        } else if (file.length() == 0) {
-            wordName.setText("El archivo está vacío");
-        } else {
-            openFile(file);
-        }
-    }
-
-    @FXML
-    private void printTable() {
-        PrinterJob printerJob = PrinterJob.createPrinterJob();
-        if (printerJob != null && printerJob.showPrintDialog(primaryStage)) {
-            for (Component component : components) {
-                printerJob.printPage(component.getNode());
-            }
-            printerJob.endJob();
-        }
-    }
-
-    private void openFile(File file) {
-        wordName.setText(file.getName());
-
-        int extensionIndex = file.getName().lastIndexOf('.');
-        String fileExtension = file.getName().substring(extensionIndex);
-
-        switch (fileExtension) {
-            case ".txt":
-                TxtFileReader.read(file, wordName, componentsTable);
-                break;
-
-            case ".csv":
-                CsvFileReader.read(file, wordName, componentsTable);
-                break;
-
-            case ".asq":
-                wordName.setText("Archivo de la máquina 1: " + fileExtension);
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    @FXML
-    private void exportToAsq() {
-        AsqWriter.generate(components);
-    }
-
-    @FXML
-    private void exportToCsv() {
-        CsvWriter.generate(components);
-    }
-
-    @FXML
-    private void saveToDb() {
-        session = sessionFactory.openSession();
-        Transaction transaction = null;
-        Board board = components.get(0).getBoardFK();
-
-        try {
-            transaction = session.beginTransaction();
-            session.save(board);
-            transaction.commit();
-
-            // TODO: mostrar mensaje de hecho
-
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-    }
-
+    // TODO: plantearme si hacer una clase para controlar conexiones con bbdd
     private void startDataBase() {
         configuration = new Configuration().configure();
         sessionFactory = configuration.buildSessionFactory();
@@ -216,8 +125,101 @@ public class MainController {
         }
     }
 
-    private void closeDataBase() {
+
+    @FXML
+    private void handleOpenFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open File");
+        File file = fileChooser.showOpenDialog(primaryStage);
+        // TODO: controlar el tipo de archivos que puede abrir
+
+        if (file == null || !file.exists()) {
+            // TODO: mostrar mensajes de otra forma
+            wordName.setText("No se ha encontrado el archivo");
+        } else if (file.length() == 0) {
+            // TODO: mostrar mensajes de otra forma
+            wordName.setText("El archivo está vacío");
+        } else {
+            openFile(file);
+        }
+    }
+
+    private void openFile(File file) {
+        wordName.setText(file.getName());
+
+        int extensionIndex = file.getName().lastIndexOf('.');
+        String fileExtension = file.getName().substring(extensionIndex);
+
+        switch (fileExtension) {
+            case ".txt":
+                TxtFileReader.read(file, wordName, componentsTable);
+                break;
+
+            case ".csv":
+                CsvFileReader.read(file, wordName, componentsTable);
+                break;
+
+            case ".asq":
+                // TODO: se necesita poder abrir este tipo?
+                wordName.setText("Archivo de la máquina 1: " + fileExtension);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    @FXML
+    private void setDefaultDirectory() {
+
+    }
+
+    @FXML
+    private void exportToAsq() {
+        AsqWriter.generate(components);
+    }
+
+    @FXML
+    private void exportToCsv() {
+        CsvWriter.generate(components);
+    }
+
+    @FXML
+    private void printTable() {
+        PrinterJob printerJob = PrinterJob.createPrinterJob();
+        if (printerJob != null && printerJob.showPrintDialog(primaryStage)) {
+            for (Component component : components) {
+                printerJob.printPage(component.getNode());
+            }
+            printerJob.endJob();
+            // TODO: Mostrar mensaje de que se ha completado
+        }
+    }   
+
+    @FXML
+    private void saveToDb() {
+        session = sessionFactory.openSession();
+        Transaction transaction = null;
+        Board board = components.get(0).getBoardFK();
+
+        try {
+            transaction = session.beginTransaction();
+            session.save(board);
+            transaction.commit();
+
+            // TODO: mostrar mensaje de hecho
+        } catch (Exception e) {
+            // TODO: mostrar mensaje de error producido
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+    }
+
+    public static void closeDataBase() {
         session.close();
+        sessionFactory.close();
     }
 
 }

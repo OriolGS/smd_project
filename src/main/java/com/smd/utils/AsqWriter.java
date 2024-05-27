@@ -13,6 +13,7 @@ public class AsqWriter {
     private static final String HASH = "#";
     private static final String SEPARATOR = ",";
     private static final String CHUCK = HASH + "PXY" + HASH + SEPARATOR;
+    // TODO: cambiar cómo se consigue el nombre del archivo
     private static final String FILE_NAME = "production1Maquina1.asq";
     private static String asqText = "";
 

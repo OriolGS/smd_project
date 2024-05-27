@@ -15,7 +15,7 @@ import javafx.scene.layout.VBox;
 
 @Entity
 @Table(name = "component")
-public class Component implements Serializable{
+public class Component implements Serializable {
     @Id
     @Column(name = "Identifier", length = 20)
     private String identifier;
@@ -78,10 +78,6 @@ public class Component implements Serializable{
         this.identifier = identifier;
     }
 
-    // public Board getBoardFK() {
-    // return boardFK;
-    // }
-
     public Board getBoardFK() {
         return boardFK;
     }
@@ -139,6 +135,7 @@ public class Component implements Serializable{
     }
 
     public Node getNode() {
+        // TODO: modificar cómo se muestran
         VBox vbox = new VBox();
         vbox.getChildren().addAll(
                 new Label("Identifier: " + identifier),

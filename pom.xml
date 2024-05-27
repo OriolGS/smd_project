@@ -6,7 +6,7 @@
 
     <groupId>com.smd</groupId>
     <artifactId>smd_project</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -16,7 +16,6 @@
     </properties>
 
     <dependencies>
-        <!-- Dependencia para la interfaz gráfica (JavaFX) -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>

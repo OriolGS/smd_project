@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-
 import com.smd.gui.MainController;
 import com.smd.model.Board;
 import com.smd.model.Component;
@@ -18,35 +16,35 @@ import javafx.scene.control.TableView;
 public class TxtFileReader {
     private static final String INITIAL_LINE_EXPECTED = ".PARTS";
     private static final String FINAL_LINE = ".ENDPARTS";
-    private static ArrayList<Component> components = new ArrayList<>();
 
     public static void read(File file, Label wordName, TableView<Component> componentsTable) {
-        Board board = generateBoard(file.getName());
-
         BufferedReader br = null;
         String line = "";
         MainController.components.clear();
 
+        Board board = generateBoard(file.getName());
+
         try {
             br = new BufferedReader(new FileReader(file));
-            // ArrayList<Component> components = new ArrayList<>();
             line = br.readLine();
-            if (line.trim().equals(INITIAL_LINE_EXPECTED)) {
 
+            if (line.trim().equals(INITIAL_LINE_EXPECTED)) {
                 while ((line = br.readLine()) != null && !line.trim().equals(FINAL_LINE)) {
                     extractComponent(line, board);
                 }
-
                 board.setComponents(MainController.components);
-
                 componentsTable.setItems(FXCollections.observableArrayList(MainController.components));
 
             } else {
+                // TODO: mostrar mensajes de otra forma
                 wordName.setText("Estructura de archivo inválida: debe empezar con .PARTS");
             }
+
         } catch (IOException e) {
+            // TODO: mostrar mensajes de otra forma
             wordName.setText("No se ha podido leer bien el archivo");
         } catch (SecurityException e) {
+            // TODO: mostrar mensajes de otra forma
             wordName.setText("Problema de seguridad al acceder al archivo");
         } finally {
             if (br != null) {
@@ -82,15 +80,16 @@ public class TxtFileReader {
         }
 
         MainController.components.add(c);
-
     }
 
     private static Board generateBoard(String fileName) {
         Board board = new Board();
-        // TODO: extract .txt
-        board.setBoardName(fileName);
-        board.setProgram(ProgramType.Seetrax);
+        
+        int extensionIndex = fileName.lastIndexOf('.');
+        String boardName = fileName.substring(0, extensionIndex);
 
+        board.setBoardName(boardName);
+        board.setProgram(ProgramType.Seetrax);
         return board;
     }
 }
