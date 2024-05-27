@@ -1,27 +1,52 @@
 package com.smd.model;
 
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
-public class Component {
-    String identifier;
-    int boardFK;
-    String type;
-    String outline;
-    Float posX;
-    Float posY;
-    Float rotation;
-    Boolean flip;
+@Entity
+@Table(name = "component")
+public class Component implements Serializable{
+    @Id
+    @Column(name = "Identifier", length = 20)
+    private String identifier;
+
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "BoardFk", referencedColumnName = "ID", nullable = false)
+    private Board boardFK;
+
+    @Column(name = "Type", length = 50)
+    private String type;
+
+    @Column(name = "Outline", length = 50)
+    private String outline;
+
+    @Column(name = "PosX")
+    private Float posX;
+
+    @Column(name = "PosY")
+    private Float posY;
+
+    @Column(name = "Rotation")
+    private Float rotation;
+
+    @Column(name = "Flip")
+    private Boolean flip;
 
     public Component() {
     }
 
-    public Component(String outline) {
-        this.outline = outline;
-    }
-
-    public Component(String identifier, int boardFK, String type, String outline, String posX, String posY,
+    public Component(String identifier, Board boardFK, String type, String outline, String posX, String posY,
             String rotation, Boolean flip) {
         this.identifier = identifier;
         this.boardFK = boardFK;
@@ -33,7 +58,7 @@ public class Component {
         this.flip = flip;
     }
 
-    public Component(String identifier, int boardFK, String type, String outline, Float posX, Float posY,
+    public Component(String identifier, Board boardFK, String type, String outline, Float posX, Float posY,
             Float rotation, Boolean flip) {
         this.identifier = identifier;
         this.boardFK = boardFK;
@@ -53,11 +78,15 @@ public class Component {
         this.identifier = identifier;
     }
 
-    public int getBoardFK() {
+    // public Board getBoardFK() {
+    // return boardFK;
+    // }
+
+    public Board getBoardFK() {
         return boardFK;
     }
 
-    public void setBoardFK(int boardFK) {
+    public void setBoardFK(Board boardFK) {
         this.boardFK = boardFK;
     }
 
@@ -112,14 +141,13 @@ public class Component {
     public Node getNode() {
         VBox vbox = new VBox();
         vbox.getChildren().addAll(
-            new Label("Identifier: " + identifier),
-            new Label("Type: " + type),
-            new Label("Outline: " + outline),
-            new Label("Position X: " + posX),
-            new Label("Position Y: " + posY),
-            new Label("Rotation: " + rotation),
-            new Label("Flip: " + flip)
-        );
+                new Label("Identifier: " + identifier),
+                new Label("Type: " + type),
+                new Label("Outline: " + outline),
+                new Label("Position X: " + posX),
+                new Label("Position Y: " + posY),
+                new Label("Rotation: " + rotation),
+                new Label("Flip: " + flip));
         return vbox;
     }
 

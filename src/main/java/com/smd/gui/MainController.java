@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import com.mysql.cj.x.protobuf.MysqlxCrud.Collection;
+import com.smd.model.Board;
 import com.smd.model.Component;
 import com.smd.utils.AsqWriter;
 import com.smd.utils.CsvFileReader;
@@ -12,16 +14,20 @@ import com.smd.utils.CsvWriter;
 import com.smd.utils.TxtFileReader;
 
 import java.util.ArrayList;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.converter.StringConverter;
 import javafx.fxml.FXML;
 import javafx.print.PrinterJob;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.FileChooser;
@@ -153,6 +159,38 @@ public class MainController {
     @FXML
     private void exportToCsv() {
         CsvWriter.generate(components);
+    }
+
+    @FXML
+    private void saveToDb(){
+        Configuration configuration = new Configuration().configure();
+        SessionFactory sessionFactory = configuration.buildSessionFactory();
+        
+        Session session = sessionFactory.openSession();
+        Transaction transaction = null;
+
+        Board board = components.get(0).getBoardFK();
+
+        try {
+            // Iniciar una transacción
+            transaction = session.beginTransaction();
+
+            session.save(board);
+
+            // Commit de la transacción
+            transaction.commit();
+
+            // Todo: mostrar mensaje de que se ha realizado correctamente
+            System.out.println("Board and Component have been saved successfully!");
+
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
     }
 
 }

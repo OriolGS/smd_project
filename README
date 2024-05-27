@@ -30,13 +30,11 @@ Asegúrate de tener instalado lo siguiente antes de comenzar:
 
 Relacionado con bbdd:
 
-- Habilitar guardar a base de datos con hibernate
-
-- Crear botón para guardar información a base de datos
-
 - Detectar si una placa ya está en la base de datos o no
 
 - Cargar / recargar base de datos
+
+- Implementar botón de cancelar
 
 - Cargar otra base de datos (mirar si tenemos que hacerlo)
 
@@ -50,6 +48,8 @@ Otras funcionalidades:
 - Añadir funcionalidad de directorio en el que exportar
 
 - Mirar si cambiar la forma en la que se imprimen los componentes
+
+- Crear método para controlar cuando se cierra la aplicación (comprobar si hay algo a medias, cerrar sesiones a base de datos...)
 
 
 Funcionalidades de info:

@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import com.smd.gui.MainController;
+import com.smd.model.Board;
 import com.smd.model.Component;
+import com.smd.model.ProgramType;
 
 import javafx.collections.FXCollections;
 import javafx.scene.control.Label;
@@ -19,6 +21,9 @@ public class CsvFileReader {
     private static ArrayList<Component> components = new ArrayList<>();
 
     public static void read(File file, Label wordName, TableView<Component> componentsTable) {
+        Board board = generateBoard(file.getName());
+        
+        
         BufferedReader br = null;
         MainController.components.clear();
         try {
@@ -26,7 +31,7 @@ public class CsvFileReader {
 
             if (br.readLine().trim().equals(COLUMNS_EXPECTED)) {
 
-                extractComponents(br);
+                extractComponents(br, board);
 
                 componentsTable.setItems(FXCollections.<Component>observableArrayList(MainController.components));
 
@@ -48,7 +53,7 @@ public class CsvFileReader {
         }
     }
 
-    private static void extractComponents(BufferedReader br) throws IOException {
+    private static void extractComponents(BufferedReader br, Board board) throws IOException {
         String line;
 
         while ((line = br.readLine()) != null) {
@@ -57,7 +62,7 @@ public class CsvFileReader {
             if (data.length == 7) {
                 c = new Component(
                         removeQuotes(data[0]),
-                        1,
+                        board,
                         removeQuotes(data[1]),
                         removeQuotes(data[2]),
                         removeQuotes(data[3]),
@@ -68,7 +73,7 @@ public class CsvFileReader {
             } else {
                 c = new Component(
                         removeQuotes(data[0]),
-                        1,
+                        board,
                         removeQuotes(data[1] + "," + data[2]),
                         removeQuotes(data[3]),
                         removeQuotes(data[4]),
@@ -88,6 +93,14 @@ public class CsvFileReader {
         } else {
             return word;
         }
+    }
 
+     private static Board generateBoard(String fileName) {
+        Board board = new Board();
+        // TODO: extract .csv
+        board.setBoardName(fileName);
+        board.setProgram(ProgramType.KiCad);
+
+        return board;
     }
 }

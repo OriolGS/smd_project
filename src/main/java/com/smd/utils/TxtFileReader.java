@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import com.smd.gui.MainController;
+import com.smd.model.Board;
 import com.smd.model.Component;
+import com.smd.model.ProgramType;
 
 import javafx.collections.FXCollections;
 import javafx.scene.control.Label;
@@ -19,6 +21,8 @@ public class TxtFileReader {
     private static ArrayList<Component> components = new ArrayList<>();
 
     public static void read(File file, Label wordName, TableView<Component> componentsTable) {
+        Board board = generateBoard(file.getName());
+
         BufferedReader br = null;
         String line = "";
         MainController.components.clear();
@@ -30,8 +34,10 @@ public class TxtFileReader {
             if (line.trim().equals(INITIAL_LINE_EXPECTED)) {
 
                 while ((line = br.readLine()) != null && !line.trim().equals(FINAL_LINE)) {
-                    extractComponent(line);
+                    extractComponent(line, board);
                 }
+
+                board.setComponents(MainController.components);
 
                 componentsTable.setItems(FXCollections.observableArrayList(MainController.components));
 
@@ -52,7 +58,7 @@ public class TxtFileReader {
         }
     }
 
-    private static void extractComponent(String line) {
+    private static void extractComponent(String line, Board board) {
         String[] component = new String[7];
         Component c;
 
@@ -68,13 +74,23 @@ public class TxtFileReader {
         data = line.substring(component[4].length()).trim().split(" ");
 
         if (data.length == 1) {
-            c = new Component(component[0], 1, component[1], component[2], component[3], component[4],
+            c = new Component(component[0], board, component[1], component[2], component[3], component[4],
                     data[0].trim(), false);
         } else {
-            c = new Component(component[0], 1, component[1], component[2], component[3], component[4],
+            c = new Component(component[0], board, component[1], component[2], component[3], component[4],
                     data[1].trim(), true);
         }
 
         MainController.components.add(c);
+
+    }
+
+    private static Board generateBoard(String fileName) {
+        Board board = new Board();
+        // TODO: extract .txt
+        board.setBoardName(fileName);
+        board.setProgram(ProgramType.Seetrax);
+
+        return board;
     }
 }
