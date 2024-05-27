@@ -30,11 +30,9 @@ Asegúrate de tener instalado lo siguiente antes de comenzar:
 
 Relacionado con bbdd:
 
-- Detectar si una placa ya está en la base de datos o no
+- Detectar si una placa ya está en la base de datos o no -- ¿Qué comprobar exáctamente?
 
-- Cargar / recargar base de datos
-
-- Implementar botón de cancelar
+- Implementar botón de cancelar + control habilitación botones
 
 - Cargar otra base de datos (mirar si tenemos que hacerlo)
 

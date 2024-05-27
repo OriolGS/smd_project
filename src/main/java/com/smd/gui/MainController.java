@@ -14,6 +14,11 @@ import com.smd.utils.CsvWriter;
 import com.smd.utils.TxtFileReader;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -35,6 +40,10 @@ import javafx.stage.Stage;
 import javafx.util.converter.*;
 
 public class MainController {
+
+    private static Configuration configuration;
+    private static SessionFactory sessionFactory;
+    private static Session session;
 
     private Stage primaryStage;
 
@@ -85,22 +94,17 @@ public class MainController {
 
         // Hacer las columnas editables
         identifier.setCellFactory(TextFieldTableCell.forTableColumn());
-        // ...
-        identifier.setCellFactory(TextFieldTableCell.forTableColumn());
         type.setCellFactory(TextFieldTableCell.forTableColumn());
         outline.setCellFactory(TextFieldTableCell.forTableColumn());
         posX.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
         posY.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
         rotation.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
         flip.setCellFactory(TextFieldTableCell.forTableColumn(new BooleanStringConverter()));
+        startDataBase();
+        loadInfoFromDataBase();
 
         // componentsTable.setItems(initialData());
     }
-
-    // public void setPrimaryStage(Stage stage) {
-    // this.primaryStage = stage;
-    // this.wordName.setText("HOLA MUNDO");
-    // }
 
     @FXML
     private void handleOpen() {
@@ -162,35 +166,58 @@ public class MainController {
     }
 
     @FXML
-    private void saveToDb(){
-        Configuration configuration = new Configuration().configure();
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
-        
-        Session session = sessionFactory.openSession();
+    private void saveToDb() {
+        session = sessionFactory.openSession();
         Transaction transaction = null;
-
         Board board = components.get(0).getBoardFK();
 
         try {
-            // Iniciar una transacción
             transaction = session.beginTransaction();
-
             session.save(board);
-
-            // Commit de la transacción
             transaction.commit();
 
-            // Todo: mostrar mensaje de que se ha realizado correctamente
-            System.out.println("Board and Component have been saved successfully!");
+            // TODO: mostrar mensaje de hecho
 
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
             e.printStackTrace();
-        } finally {
-            session.close();
         }
+    }
+
+    private void startDataBase() {
+        configuration = new Configuration().configure();
+        sessionFactory = configuration.buildSessionFactory();
+        session = sessionFactory.openSession();
+    }
+
+    @FXML
+    private void loadInfoFromDataBase() {
+        try {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Board> criteriaQuery = builder.createQuery(Board.class);
+            Root<Board> root = criteriaQuery.from(Board.class);
+            criteriaQuery.select(root);
+
+            List<Board> boards = session.createQuery(criteriaQuery).getResultList();
+            components.clear();
+            for (Board board : boards) {
+                for (Component component : board.getComponents()) {
+                    components.add(component);
+                }
+            }
+
+            componentsTable.setItems(FXCollections.<Component>observableArrayList(MainController.components));
+
+        } catch (Exception e) {
+            // TODO: mostrar mensaje por pantalla
+            e.printStackTrace();
+        }
+    }
+
+    private void closeDataBase() {
+        session.close();
     }
 
 }

@@ -23,7 +23,6 @@ public class CsvFileReader {
     public static void read(File file, Label wordName, TableView<Component> componentsTable) {
         Board board = generateBoard(file.getName());
         
-        
         BufferedReader br = null;
         MainController.components.clear();
         try {
@@ -33,6 +32,8 @@ public class CsvFileReader {
 
                 extractComponents(br, board);
 
+                board.setComponents(MainController.components);
+                
                 componentsTable.setItems(FXCollections.<Component>observableArrayList(MainController.components));
 
             } else {

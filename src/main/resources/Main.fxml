@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.smd.gui.MainController">
+<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.smd.gui.MainController">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -21,6 +21,7 @@
             <MenuItem mnemonicParsing="false" onAction="#handleOpen" text="Open…" />
                   <Menu mnemonicParsing="false" text="Export...">
                     <items>
+                  <MenuItem mnemonicParsing="false" text="set directory" />
                   <MenuItem mnemonicParsing="false" onAction="#exportToAsq" text="to .asq" />
                       <MenuItem mnemonicParsing="false" onAction="#exportToCsv" text="to .csv" />
                     </items>
@@ -28,15 +29,15 @@
             <MenuItem mnemonicParsing="false" onAction="#printTable" text="Print" />
           </items>
         </Menu>
-        <Menu mnemonicParsing="false" text="Setup">
+        <Menu mnemonicParsing="false" text="Database">
           <items>
-            <MenuItem mnemonicParsing="false" text="Database" />
-            <MenuItem mnemonicParsing="false" text="Export directory" />
+                  <MenuItem mnemonicParsing="false" text="Reload" onAction="#loadInfoFromDataBase"/>
+            <MenuItem mnemonicParsing="false" text="Configuration" />
           </items>
         </Menu>
-            <Menu mnemonicParsing="false" text="Help">
+            <Menu mnemonicParsing="false" text="PBC">
                <items>
-                  <MenuItem mnemonicParsing="false" text="Centrar" />
+                  <MenuItem mnemonicParsing="false" text="Center" />
                   <MenuItem mnemonicParsing="false" text="Flip board" />
                </items>
             </Menu>
@@ -71,7 +72,7 @@
       <ButtonBar maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="40.0">
         <buttons>
           <Button mnemonicParsing="false" text="Cancel" />
-          <Button mnemonicParsing="false" text="Save" onAction="#saveToDb"/>
+          <Button mnemonicParsing="false" onAction="#saveToDb" text="Save" />
         </buttons>
          <VBox.margin>
             <Insets bottom="5.0" right="5.0" top="5.0" />
