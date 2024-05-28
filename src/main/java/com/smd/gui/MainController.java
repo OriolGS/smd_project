@@ -89,16 +89,27 @@ public class MainController {
         posY.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
         rotation.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
         flip.setCellFactory(TextFieldTableCell.forTableColumn(new BooleanStringConverter()));
-        
-        startDataBase();
-        loadInfoFromDataBase();
+
+        try {
+            startDataBase();
+            loadInfoFromDataBase();
+        } catch (Exception e) {
+            // Si ocurre una excepción, significa que no se pudo conectar a la base de datos
+            wordName.setText("No se pudo conectar a la base de datos.");
+            e.printStackTrace();
+        }
     }
 
     // TODO: plantearme si hacer una clase para controlar conexiones con bbdd
-    private void startDataBase() {
-        configuration = new Configuration().configure();
-        sessionFactory = configuration.buildSessionFactory();
-        session = sessionFactory.openSession();
+    private void startDataBase() throws Exception {
+        try {
+            configuration = new Configuration().configure();
+            sessionFactory = configuration.buildSessionFactory();
+            session = sessionFactory.openSession();
+        } catch (Exception e) {
+            // Manejo de excepción para la conexión a la base de datos
+            throw new Exception("Error al iniciar la base de datos", e);
+        }
     }
 
     @FXML
@@ -124,7 +135,6 @@ public class MainController {
             e.printStackTrace();
         }
     }
-
 
     @FXML
     private void handleOpenFile() {
@@ -194,15 +204,15 @@ public class MainController {
             printerJob.endJob();
             // TODO: Mostrar mensaje de que se ha completado
         }
-    }   
+    }
 
     @FXML
     private void saveToDb() {
-        session = sessionFactory.openSession();
+        
         Transaction transaction = null;
-        Board board = components.get(0).getBoardFK();
-
         try {
+            session = sessionFactory.openSession();
+            Board board = components.get(0).getBoardFK();
             transaction = session.beginTransaction();
             session.save(board);
             transaction.commit();
@@ -218,8 +228,13 @@ public class MainController {
     }
 
     public static void closeDataBase() {
-        session.close();
-        sessionFactory.close();
+        try {
+            session.close();
+            sessionFactory.close();
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+       
     }
 
 }
