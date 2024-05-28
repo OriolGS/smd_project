@@ -1,4 +1,5 @@
 com\smd\model\ProgramType.class
+com\smd\controller\NotificationController.class
 com\smd\utils\CsvWriter.class
 com\smd\utils\AsqWriter.class
 com\smd\gui\Main.class

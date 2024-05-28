@@ -1,13 +1,6 @@
 package com.smd.gui;
 
 import java.io.File;
-import com.smd.model.Board;
-import com.smd.model.Component;
-import com.smd.utils.AsqWriter;
-import com.smd.utils.CsvFileReader;
-import com.smd.utils.CsvWriter;
-import com.smd.utils.TxtFileReader;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,14 +8,25 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+import org.controlsfx.control.Notifications;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 
+import com.smd.controller.NotificationController;
+import com.smd.model.Board;
+import com.smd.model.Component;
+import com.smd.utils.AsqWriter;
+import com.smd.utils.CsvFileReader;
+import com.smd.utils.CsvWriter;
+import com.smd.utils.TxtFileReader;
+
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.print.PrinterJob;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -30,7 +34,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.converter.*;
+import javafx.util.converter.BooleanStringConverter;
+import javafx.util.converter.FloatStringConverter;
 
 public class MainController {
 
@@ -89,12 +94,12 @@ public class MainController {
         posY.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
         rotation.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
         flip.setCellFactory(TextFieldTableCell.forTableColumn(new BooleanStringConverter()));
-
         try {
             startDataBase();
             loadInfoFromDataBase();
         } catch (Exception e) {
-            // Si ocurre una excepción, significa que no se pudo conectar a la base de datos
+            // TODO: mirar cómo gestionar el error, no se puede mostrar con alerta ni
+            // notificación porque aún no existe la pantalla
             wordName.setText("No se pudo conectar a la base de datos.");
             e.printStackTrace();
         }
@@ -107,8 +112,6 @@ public class MainController {
             sessionFactory = configuration.buildSessionFactory();
             session = sessionFactory.openSession();
         } catch (Exception e) {
-            // Manejo de excepción para la conexión a la base de datos
-            throw new Exception("Error al iniciar la base de datos", e);
         }
     }
 
@@ -131,8 +134,6 @@ public class MainController {
             componentsTable.setItems(FXCollections.<Component>observableArrayList(MainController.components));
 
         } catch (Exception e) {
-            // TODO: mostrar mensaje por pantalla
-            e.printStackTrace();
         }
     }
 
@@ -144,11 +145,8 @@ public class MainController {
         // TODO: controlar el tipo de archivos que puede abrir
 
         if (file == null || !file.exists()) {
-            // TODO: mostrar mensajes de otra forma
-            wordName.setText("No se ha encontrado el archivo");
         } else if (file.length() == 0) {
-            // TODO: mostrar mensajes de otra forma
-            wordName.setText("El archivo está vacío");
+            NotificationController.warningMsg("Problema con archivo", "El archivo seleccionado está vacío.");
         } else {
             openFile(file);
         }
@@ -202,13 +200,12 @@ public class MainController {
                 printerJob.printPage(component.getNode());
             }
             printerJob.endJob();
-            // TODO: Mostrar mensaje de que se ha completado
+            NotificationController.informationMsg("Proceso finalizado", "El contenido de la tabla ha sido imprimido.");
         }
     }
 
     @FXML
     private void saveToDb() {
-        
         Transaction transaction = null;
         try {
             session = sessionFactory.openSession();
@@ -217,13 +214,13 @@ public class MainController {
             session.save(board);
             transaction.commit();
 
-            // TODO: mostrar mensaje de hecho
+            NotificationController.informationMsg("Proceso finalizado",
+                    "La placa " + board.getBoardName() + " y sus componentes se ha guardado correctamente.");
         } catch (Exception e) {
-            // TODO: mostrar mensaje de error producido
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
+            NotificationController.errorMsg("Error al guardar", "Lo sentimos, no se ha podido guardar los datos en la base de datos");
         }
     }
 
@@ -232,9 +229,7 @@ public class MainController {
             session.close();
             sessionFactory.close();
         } catch (Exception e) {
-            // TODO: handle exception
         }
-       
     }
 
 }

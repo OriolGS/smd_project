@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+
+import com.smd.controller.NotificationController;
 import com.smd.gui.MainController;
 import com.smd.model.Board;
 import com.smd.model.Component;
@@ -36,16 +38,13 @@ public class TxtFileReader {
                 componentsTable.setItems(FXCollections.observableArrayList(MainController.components));
 
             } else {
-                // TODO: mostrar mensajes de otra forma
-                wordName.setText("Estructura de archivo inválida: debe empezar con .PARTS");
+                NotificationController.warningMsg("Estructura de archivo inválida", "El archivo debe empezar con .PARTS");
             }
 
         } catch (IOException e) {
-            // TODO: mostrar mensajes de otra forma
-            wordName.setText("No se ha podido leer bien el archivo");
+            NotificationController.errorMsg("Error", "No se ha podido leer bien el archivo.");
         } catch (SecurityException e) {
-            // TODO: mostrar mensajes de otra forma
-            wordName.setText("Problema de seguridad al acceder al archivo");
+            NotificationController.warningMsg("Atención!", "Problema de seguridad al acceder al archivo. No se ha podido abrir.");
         } finally {
             if (br != null) {
                 try {
@@ -84,7 +83,7 @@ public class TxtFileReader {
 
     private static Board generateBoard(String fileName) {
         Board board = new Board();
-        
+
         int extensionIndex = fileName.lastIndexOf('.');
         String boardName = fileName.substring(0, extensionIndex);
 

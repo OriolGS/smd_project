@@ -32,6 +32,8 @@ Relacionado con bbdd:
 
 - Detectar si una placa ya está en la base de datos o no --> ¿Qué comprobar exáctamente?
 
+- No cargar todo lo de la base de datos, mostrar listado de las placas y cuando se seleccione una, mostar sus componentes
+
 - Implementar botón de cancelar + control habilitación botones
 
 - Cargar otra base de datos (mirar si tenemos que hacerlo)

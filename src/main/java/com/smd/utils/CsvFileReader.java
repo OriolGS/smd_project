@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+
+import com.smd.controller.NotificationController;
 import com.smd.gui.MainController;
 import com.smd.model.Board;
 import com.smd.model.Component;
@@ -32,16 +34,13 @@ public class CsvFileReader {
                 board.setComponents(MainController.components);
                 componentsTable.setItems(FXCollections.<Component>observableArrayList(MainController.components));
             } else {
-                // TODO: mostrar mensajes de otra forma
-                wordName.setText("Estructura de archivo inválida.");
+                NotificationController.warningMsg("Estructura de archivo inválida", "Los campos deben ser: Ref,Val,Package,PosX,PosY,Rot,Side");
             }
 
         } catch (IOException e) {
-            // TODO: mostrar mensajes de otra forma
-            wordName.setText("No se ha podido leer bien el archivo");
+            NotificationController.errorMsg("Error", "No se ha podido leer bien el archivo.");
         } catch (SecurityException e) {
-            // TODO: mostrar mensajes de otra forma
-            wordName.setText("Problema de seguridad al acceder al archivo");
+            NotificationController.warningMsg("Atención!", "Problema de seguridad al acceder al archivo. No se ha podido abrir.");
         } finally {
             if (br != null) {
                 try {
