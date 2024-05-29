@@ -3,12 +3,14 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -21,7 +23,7 @@
             <MenuItem mnemonicParsing="false" onAction="#handleOpenFile" text="Open…" />
                   <Menu mnemonicParsing="false" text="Export...">
                     <items>
-                  <MenuItem mnemonicParsing="false" text="set directory" onAction="#setDefaultDirectory"/>
+                  <MenuItem mnemonicParsing="false" onAction="#setDefaultDirectory" text="set directory" />
                   <MenuItem mnemonicParsing="false" onAction="#exportToAsq" text="to .asq" />
                       <MenuItem mnemonicParsing="false" onAction="#exportToCsv" text="to .csv" />
                     </items>
@@ -31,7 +33,7 @@
         </Menu>
         <Menu mnemonicParsing="false" text="Database">
           <items>
-                  <MenuItem mnemonicParsing="false" text="Reload" onAction="#loadInfoFromDataBase"/>
+                  <MenuItem mnemonicParsing="false" onAction="#loadInfoFromDb" text="Reload" />
             <MenuItem mnemonicParsing="false" text="Configuration" />
           </items>
         </Menu>
@@ -53,7 +55,28 @@
           <Insets bottom="2.0" left="2.0" top="2.0" />
         </padding>
     </MenuBar>
-  <Label fx:id="wordName" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="40.0" prefWidth="640.0" style="&#10;" text="Drag components from Library here…" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false">
+      <Label fx:id="dbNameLabel" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="40.0" prefWidth="640.0" style="&#10;" text="Nombre de la base de datos" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0">
+        <children>
+            <Label alignment="CENTER" contentDisplay="RIGHT" maxHeight="1.7976931348623157E308" prefWidth="150.0" text="Escoge una placa:" />
+            <ComboBox fx:id="comboBoxBoards" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="150.0" />
+            <Button alignment="CENTER" maxHeight="1.7976931348623157E308" mnemonicParsing="false" prefWidth="100.0" text="Cargar" onAction="#loadInfoFromDb">
+               <HBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </HBox.margin></Button>
+        </children>
+        <VBox.margin>
+            <Insets />
+        </VBox.margin>
+        <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+        </padding>
+    </HBox>
+  <Label fx:id="wordNameLabel" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="40.0" prefWidth="640.0" style="&#10;" text="Drag components from Library here…" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false">
     <font>
       <Font size="18.0" />
     </font>

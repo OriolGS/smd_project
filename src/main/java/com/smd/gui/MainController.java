@@ -8,7 +8,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.controlsfx.control.Notifications;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -25,8 +24,7 @@ import com.smd.utils.TxtFileReader;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.print.PrinterJob;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -46,12 +44,19 @@ public class MainController {
     private static Session session;
 
     public static ArrayList<Component> components = new ArrayList<>();
+    public static List<Board> boards;
 
     @FXML
-    private Label wordName;
+    private Label dbNameLabel;
 
     @FXML
-    private TableView componentsTable;
+    private Label wordNameLabel;
+
+    @FXML
+    private ComboBox<String> comboBoxBoards;
+
+    @FXML
+    private TableView<Component> componentsTable;
 
     @FXML
     private TableColumn<Component, String> identifier;
@@ -76,8 +81,9 @@ public class MainController {
 
     @FXML
     public void initialize() {
-        this.wordName.setText("Bienvenido");
+        this.wordNameLabel.setText("Bienvenido");
 
+        // comboBoxBoards = new ComboBox<String>();
         identifier.setCellValueFactory(new PropertyValueFactory<>("identifier"));
         type.setCellValueFactory(new PropertyValueFactory<>("type"));
         outline.setCellValueFactory(new PropertyValueFactory<>("outline"));
@@ -95,18 +101,18 @@ public class MainController {
         rotation.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
         flip.setCellFactory(TextFieldTableCell.forTableColumn(new BooleanStringConverter()));
         try {
-            startDataBase();
-            loadInfoFromDataBase();
+            startDb();
+            getBoardsFromDb();
         } catch (Exception e) {
             // TODO: mirar cómo gestionar el error, no se puede mostrar con alerta ni
             // notificación porque aún no existe la pantalla
-            wordName.setText("No se pudo conectar a la base de datos.");
+            wordNameLabel.setText("No se pudo conectar a la base de datos.");
             e.printStackTrace();
         }
     }
 
     // TODO: plantearme si hacer una clase para controlar conexiones con bbdd
-    private void startDataBase() throws Exception {
+    private void startDb() throws Exception {
         try {
             configuration = new Configuration().configure();
             sessionFactory = configuration.buildSessionFactory();
@@ -115,25 +121,60 @@ public class MainController {
         }
     }
 
+    private void getBoardsFromDb() {
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Board> criteriaQuery = builder.createQuery(Board.class);
+        Root<Board> root = criteriaQuery.from(Board.class);
+        criteriaQuery.select(root);
+
+        boards = session.createQuery(criteriaQuery).getResultList();
+
+        comboBoxBoards.getItems().clear();
+
+        if (boards != null) {
+            for (Board board : boards) {
+                comboBoxBoards.getItems().add(board.getBoardName());
+            }
+        } else {
+            dbNameLabel.setText("No se ha encontrado la base de datos");
+        }
+    }
+
     @FXML
-    private void loadInfoFromDataBase() {
+    private void loadInfoFromDb() {
+        components.clear();
+        boards.clear();
         try {
+            session = sessionFactory.openSession();
             CriteriaBuilder builder = session.getCriteriaBuilder();
             CriteriaQuery<Board> criteriaQuery = builder.createQuery(Board.class);
             Root<Board> root = criteriaQuery.from(Board.class);
             criteriaQuery.select(root);
 
-            List<Board> boards = session.createQuery(criteriaQuery).getResultList();
-            components.clear();
-            for (Board board : boards) {
-                for (Component component : board.getComponents()) {
-                    components.add(component);
+            boards = session.createQuery(criteriaQuery).getResultList();
+
+            String boardName = comboBoxBoards.getSelectionModel().isEmpty() ? "" : comboBoxBoards.getValue();
+
+            if (boardName != "") {
+                for (Board board : boards) {
+                    if (boardName.equals(board.getBoardName())) {
+                        components.addAll(board.getComponents());
+                    }
                 }
+                
+                if (components.size() != 0) {
+                    componentsTable.setItems(FXCollections.<Component>observableArrayList(components));
+                } else {
+                    NotificationController.warningMsg("Componentes no encontrados",
+                            "No hemos podido extraer los componentes. Comprueba que la placa tiene componentes.");
+                }
+            } else {
+                NotificationController.informationMsg("Escoge una placa",
+                        "No podemos cargar los componentes si no tienes una placa seleccionada.");
             }
 
-            componentsTable.setItems(FXCollections.<Component>observableArrayList(MainController.components));
-
         } catch (Exception e) {
+            NotificationController.errorMsg("Error", "No se han podido cargar los componentes.");
         }
     }
 
@@ -153,23 +194,23 @@ public class MainController {
     }
 
     private void openFile(File file) {
-        wordName.setText(file.getName());
+        wordNameLabel.setText(file.getName());
 
         int extensionIndex = file.getName().lastIndexOf('.');
         String fileExtension = file.getName().substring(extensionIndex);
 
         switch (fileExtension) {
             case ".txt":
-                TxtFileReader.read(file, wordName, componentsTable);
+                TxtFileReader.read(file, wordNameLabel, componentsTable);
                 break;
 
             case ".csv":
-                CsvFileReader.read(file, wordName, componentsTable);
+                CsvFileReader.read(file, wordNameLabel, componentsTable);
                 break;
 
             case ".asq":
                 // TODO: se necesita poder abrir este tipo?
-                wordName.setText("Archivo de la máquina 1: " + fileExtension);
+                wordNameLabel.setText("Archivo de la máquina 1: " + fileExtension);
                 break;
 
             default:
@@ -220,11 +261,14 @@ public class MainController {
             if (transaction != null) {
                 transaction.rollback();
             }
-            NotificationController.errorMsg("Error al guardar", "Lo sentimos, no se ha podido guardar los datos en la base de datos");
+            NotificationController.errorMsg("Error al guardar",
+                    "Lo sentimos, no se ha podido guardar los datos en la base de datos");
         }
+
+        getBoardsFromDb();
     }
 
-    public static void closeDataBase() {
+    public static void closeDb() {
         try {
             session.close();
             sessionFactory.close();

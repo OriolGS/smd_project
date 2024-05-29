@@ -30,13 +30,15 @@ Asegúrate de tener instalado lo siguiente antes de comenzar:
 
 Relacionado con bbdd:
 
-- Detectar si una placa ya está en la base de datos o no --> ¿Qué comprobar exáctamente?
+- Detectar si una placa ya está en la base de datos con el nombre de esta
 
-- No cargar todo lo de la base de datos, mostrar listado de las placas y cuando se seleccione una, mostar sus componentes
+- Al guardar, preguntar nombre de la placa
+
+- Implementar base de datos de phpMyAdmin
 
 - Implementar botón de cancelar + control habilitación botones
 
-- Cargar otra base de datos (mirar si tenemos que hacerlo)
+- Cargar otra base de datos
 
 
 Otras funcionalidades:
@@ -49,8 +51,15 @@ Otras funcionalidades:
 
 - Mirar si cambiar la forma en la que se imprimen los componentes
 
-- Crear método para controlar cuando se cierra la aplicación (comprobar si hay algo a medias, cerrar sesiones a base de datos...)
+- Preguntar el nombre de la placa
 
+- Permitir dos archivos de csv para la misma placa
+
+- Exportar dos archivos siempre (uno por cada cara)
+
+- Añadir un process indicator para ciertos procesos
+
+- Mejorar método para controlar el cierre de la aplicación (comprobar si hay algo a medias, cerrar sesiones a base de datos...)
 
 Funcionalidades de info:
 - Crear manual

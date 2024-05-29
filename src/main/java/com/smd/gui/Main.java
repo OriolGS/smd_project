@@ -22,7 +22,7 @@ public class Main extends Application {
 
         primaryStage.setOnCloseRequest(event -> {
             // TODO: mirar si hay que controlar algo más
-            MainController.closeDataBase();
+            MainController.closeDb();
         });
     }
 
