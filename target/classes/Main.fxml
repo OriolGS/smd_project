@@ -94,7 +94,7 @@
       </TableView>
       <ButtonBar maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="40.0">
         <buttons>
-          <Button mnemonicParsing="false" text="Cancel" />
+          <Button mnemonicParsing="false" onAction="#askForCancel" text="Cancel" />
           <Button mnemonicParsing="false" onAction="#askBoardName" text="Save" />
         </buttons>
         <VBox.margin>

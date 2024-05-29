@@ -330,22 +330,18 @@ public class MainController {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Información necesaria");
         dialog.setHeaderText("¿Respecto a qué quieres centrar la placa?");
-        
         // Create the radio buttons and toggle group
         RadioButton rbComponent = new RadioButton("Centrar respecto a un componente");
         RadioButton rbPosition = new RadioButton("Centrar respecto a una posición");
         ToggleGroup group = new ToggleGroup();
         rbComponent.setToggleGroup(group);
         rbPosition.setToggleGroup(group);
-        
         // Add radio buttons to a VBox
         VBox vbox = new VBox(rbComponent, rbPosition);
         dialog.getDialogPane().setContent(vbox);
-        
         // Add OK and Cancel buttons to the dialog
         ButtonType okButtonType = new ButtonType("OK", ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
-
         // Show the dialog and wait for a response
         dialog.showAndWait().ifPresent(response -> {
             if (response == okButtonType) {
@@ -445,6 +441,26 @@ public class MainController {
         componentsTable.refresh();
         // Show notification message
         NotificationController.informationMsg("Proceso Completado", "La placa ha sido volteada.");
+    }
+
+    public void askForCancel() {
+        // Create the dialog
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Información necesaria");
+        dialog.setHeaderText("¿Estás seguro de que quieres cancelar?");
+        // Add OK and Cancel buttons to the dialog
+        ButtonType okButtonType = new ButtonType("OK", ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
+        // Show the dialog and wait for a response
+        dialog.showAndWait().ifPresent(response -> {
+            if (response == okButtonType) {
+                //empty table
+                components.clear();
+                componentsTable.setItems(FXCollections.<Components>observableArrayList(components));
+                // Show notification message
+                NotificationController.informationMsg("Proceso Cancelado", "El proceso ha sido cancelado.");
+            }
+        });
     }
 
     public static void closeDb() {
