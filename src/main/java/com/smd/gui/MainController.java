@@ -40,6 +40,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.converter.BooleanStringConverter;
@@ -55,6 +56,8 @@ public class MainController {
 
     public static ArrayList<Components> components = new ArrayList<>();
     public static List<Board> boards;
+
+    public String selectedFolderPath = "";
 
     @FXML
     private Label dbNameLabel;
@@ -191,6 +194,11 @@ public class MainController {
     private void handleOpenFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open File");
+        if (selectedFolderPath != "") {
+            fileChooser.setInitialDirectory(new File(selectedFolderPath));
+        } else {
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        }
         File file = fileChooser.showOpenDialog(primaryStage);
         // TODO: controlar el tipo de archivos que puede abrir
 
@@ -228,18 +236,29 @@ public class MainController {
     }
 
     @FXML
-    private void setDefaultDirectory() {
-
+    private String setDefaultDirectory() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Selecciona la carpeta por defecto");
+        File selectedDirectory = directoryChooser.showDialog(primaryStage);
+        if (selectedDirectory != null) {
+            selectedFolderPath = selectedDirectory.getAbsolutePath();
+            NotificationController.informationMsg("Proceso finalizado", "La carpeta por defecto ha sido seleccionada correctamente.");
+            selectedFolderPath = selectedFolderPath + "\\";
+            return selectedFolderPath;
+        } else {
+            NotificationController.warningMsg("Proceso cancelado", "No se ha seleccionado ninguna carpeta.");
+            return null;
+        }
     }
 
     @FXML
     private void exportToAsq() {
-        AsqWriter.generate(components);
+        AsqWriter.generate(components, selectedFolderPath);
     }
 
     @FXML
     private void exportToCsv() {
-        CsvWriter.generate(components);
+        CsvWriter.generate(components, selectedFolderPath);
     }
 
     @FXML

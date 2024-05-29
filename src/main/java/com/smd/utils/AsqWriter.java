@@ -14,10 +14,11 @@ public class AsqWriter {
     private static final String SEPARATOR = ",";
     private static final String CHUCK = HASH + "PXY" + HASH + SEPARATOR;
     // TODO: cambiar cómo se consigue el nombre del archivo
-    private static final String FILE_NAME = "production1Maquina1.asq";
+    private static  String FILE_NAME = "production1Maquina1.asq";
     private static String asqText = "";
 
-    public static void generate(ArrayList<Components> components) {
+    public static void generate(ArrayList<Components> components, String directoryPath) {
+        FILE_NAME = directoryPath + FILE_NAME;
         for (Components c : components) {
             asqText += HASH + c.getIdentifier() + HASH + SEPARATOR + c.getPosX() + SEPARATOR + " " + c.getPosY() + " "
                     + c.getRotation() + SEPARATOR + CHUCK + HASH + HASH + SEPARATOR + HASH + c.getType() + " "

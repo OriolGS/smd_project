@@ -13,10 +13,12 @@ public class CsvWriter {
     private static final String COLUMNS_HEADER = "Designator,NozzleNum,StackNum,Mid X,Mid";
     private static final String SEPARATOR = ",";
     // TODO: cambiar cómo se consigue el nombre del archivo
-    private static final String FILE_NAME = "production1Maquina2.csv";
+    private static String FILE_NAME = "production1Maquina2.csv";
     private static String csvText;
 
-    public static void generate(ArrayList<Components> components) {
+    public static void generate(ArrayList<Components> components, String directoryPath) {
+        FILE_NAME = directoryPath + FILE_NAME;
+        System.out.println(FILE_NAME);
         csvText = COLUMNS_HEADER;
         csvText += "\n";
 
