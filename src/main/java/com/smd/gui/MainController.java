@@ -22,7 +22,6 @@ import com.smd.utils.CsvFileReader;
 import com.smd.utils.CsvWriter;
 import com.smd.utils.TxtFileReader;
 
-import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -34,6 +33,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.converter.BooleanStringConverter;
@@ -41,6 +41,7 @@ import javafx.util.converter.FloatStringConverter;
 
 public class MainController {
 
+    public static File exportDirectory;
     private Stage primaryStage;
 
     private static Configuration configuration;
@@ -185,9 +186,12 @@ public class MainController {
     private void handleOpenFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open File");
-        File file = fileChooser.showOpenDialog(primaryStage);
-        // TODO: controlar el tipo de archivos que puede abrir
 
+        FileChooser.ExtensionFilter txtFilter = new FileChooser.ExtensionFilter("Text Files (*.txt)", "*.txt");
+        FileChooser.ExtensionFilter csvFilter = new FileChooser.ExtensionFilter("CSV Files (*.csv)", "*.csv");
+        fileChooser.getExtensionFilters().addAll(txtFilter, csvFilter);
+        File file = fileChooser.showOpenDialog(primaryStage);
+        
         if (file == null || !file.exists()) {
         } else if (file.length() == 0) {
             NotificationController.warningMsg("Problema con archivo", "El archivo seleccionado está vacío.");
@@ -211,11 +215,6 @@ public class MainController {
                 CsvFileReader.read(file, wordNameLabel, componentsTable);
                 break;
 
-            case ".asq":
-                // TODO: se necesita poder abrir este tipo?
-                wordNameLabel.setText("Archivo de la máquina 1: " + fileExtension);
-                break;
-
             default:
                 break;
         }
@@ -223,7 +222,10 @@ public class MainController {
 
     @FXML
     private void setDefaultDirectory() {
-
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setInitialDirectory(exportDirectory);
+        directoryChooser.setTitle("Select Directory");
+        exportDirectory = directoryChooser.showDialog(primaryStage);
     }
 
     @FXML

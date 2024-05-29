@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.smd.gui.MainController;
 import com.smd.model.Component;
 
 import javafx.scene.control.Alert;
@@ -27,15 +28,20 @@ public class AsqWriter {
         }
 
         FileWriter fw = null;
+        String directory = FILE_NAME;
         try {
-            fw = new FileWriter(FILE_NAME);
+            if (MainController.exportDirectory != null) {
+                 directory = MainController.exportDirectory + "\\" + FILE_NAME;
+            }
+            
+            fw = new FileWriter(directory);
             fw.write(asqText);
             fw.close();
 
             Alert alert = new Alert(AlertType.CONFIRMATION);
             alert.setTitle("Archivo creado correctamente");
             alert.setHeaderText("El archivo se ha creado en:");
-            alert.setContentText(FILE_NAME);
+            alert.setContentText(directory);
             alert.getButtonTypes().remove(1);
             alert.show();
         } catch (IOException e) {
