@@ -29,12 +29,12 @@ public class Board {
     private ProgramType programType;
 
     @OneToMany(mappedBy = "boardFK", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Component> components;
+    private List<Components> components;
 
     public Board() {
     }
 
-    public Board(String name, ProgramType programType, ArrayList<Component> components) {
+    public Board(String name, ProgramType programType, ArrayList<Components> components) {
         this.name = name;
         this.programType = programType;
         this.components = components;
@@ -64,11 +64,11 @@ public class Board {
         this.programType = programType;
     }
 
-    public List<Component> getComponents() {
+    public List<Components> getComponents() {
         return components;
     }
 
-    public void setComponents(ArrayList<Component> components) {
+    public void setComponents(ArrayList<Components> components) {
         this.components = components;
     }
 

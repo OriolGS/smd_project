@@ -4,7 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import com.smd.model.Component;
+import com.smd.model.Components;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -16,11 +16,11 @@ public class CsvWriter {
     private static final String FILE_NAME = "production1Maquina2.csv";
     private static String csvText;
 
-    public static void generate(ArrayList<Component> components) {
+    public static void generate(ArrayList<Components> components) {
         csvText = COLUMNS_HEADER;
         csvText += "\n";
 
-        for (Component c : components) {
+        for (Components c : components) {
             csvText += c.getIdentifier() + SEPARATOR + "1/2,1," + c.getPosX() + SEPARATOR + c.getPosY() + SEPARATOR
                     + c.getRotation() + ",0,100,None,VERDADERO, " + c.getType() + " " + c.getOutline();
             csvText += "\n";

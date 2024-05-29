@@ -14,8 +14,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 @Entity
-@Table(name = "component")
-public class Component implements Serializable {
+@Table(name = "components")
+public class Components implements Serializable {
     @Id
     @Column(name = "Identifier", length = 20)
     private String identifier;
@@ -43,10 +43,10 @@ public class Component implements Serializable {
     @Column(name = "Flip")
     private Boolean flip;
 
-    public Component() {
+    public Components() {
     }
 
-    public Component(String identifier, Board boardFK, String type, String outline, String posX, String posY,
+    public Components(String identifier, Board boardFK, String type, String outline, String posX, String posY,
             String rotation, Boolean flip) {
         this.identifier = identifier;
         this.boardFK = boardFK;
@@ -58,7 +58,7 @@ public class Component implements Serializable {
         this.flip = flip;
     }
 
-    public Component(String identifier, Board boardFK, String type, String outline, Float posX, Float posY,
+    public Components(String identifier, Board boardFK, String type, String outline, Float posX, Float posY,
             Float rotation, Boolean flip) {
         this.identifier = identifier;
         this.boardFK = boardFK;

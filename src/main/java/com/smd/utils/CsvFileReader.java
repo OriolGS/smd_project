@@ -8,7 +8,7 @@ import java.io.IOException;
 import com.smd.controller.NotificationController;
 import com.smd.gui.MainController;
 import com.smd.model.Board;
-import com.smd.model.Component;
+import com.smd.model.Components;
 import com.smd.model.ProgramType;
 
 import javafx.collections.FXCollections;
@@ -19,7 +19,7 @@ public class CsvFileReader {
     private static final String DELIMITER = ",";
     private static String COLUMNS_EXPECTED = "Ref,Val,Package,PosX,PosY,Rot,Side";
 
-    public static void read(File file, Label wordName, TableView<Component> componentsTable) {
+    public static void read(File file, Label wordName, TableView<Components> componentsTable) {
         BufferedReader br = null;
         MainController.components.clear();
 
@@ -32,7 +32,7 @@ public class CsvFileReader {
                 extractComponents(br, board);
 
                 board.setComponents(MainController.components);
-                componentsTable.setItems(FXCollections.<Component>observableArrayList(MainController.components));
+                componentsTable.setItems(FXCollections.<Components>observableArrayList(MainController.components));
             } else {
                 NotificationController.warningMsg("Estructura de archivo inválida", "Los campos deben ser: Ref,Val,Package,PosX,PosY,Rot,Side");
             }
@@ -53,13 +53,13 @@ public class CsvFileReader {
 
     private static void extractComponents(BufferedReader br, Board board) throws IOException {
         String line;
-        Component c;
+        Components c;
 
         while ((line = br.readLine()) != null) {
             String[] data = line.split(DELIMITER);
 
             if (data.length == 7) {
-                c = new Component(
+                c = new Components(
                         removeQuotes(data[0]),
                         board,
                         removeQuotes(data[1]),
@@ -70,7 +70,7 @@ public class CsvFileReader {
                         removeQuotes(data[6]).equals("bottom"));
 
             } else {
-                c = new Component(
+                c = new Components(
                         removeQuotes(data[0]),
                         board,
                         removeQuotes(data[1] + "," + data[2]),

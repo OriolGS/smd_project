@@ -16,7 +16,7 @@ import org.hibernate.cfg.Configuration;
 
 import com.smd.controller.NotificationController;
 import com.smd.model.Board;
-import com.smd.model.Component;
+import com.smd.model.Components;
 import com.smd.utils.AsqWriter;
 import com.smd.utils.CsvFileReader;
 import com.smd.utils.CsvWriter;
@@ -47,7 +47,7 @@ public class MainController {
     private static SessionFactory sessionFactory;
     private static Session session;
 
-    public static ArrayList<Component> components = new ArrayList<>();
+    public static ArrayList<Components> components = new ArrayList<>();
     public static List<Board> boards;
 
     @FXML
@@ -60,28 +60,28 @@ public class MainController {
     private ComboBox<String> comboBoxBoards;
 
     @FXML
-    private TableView<Component> componentsTable;
+    private TableView<Components> componentsTable;
 
     @FXML
-    private TableColumn<Component, String> identifier;
+    private TableColumn<Components, String> identifier;
 
     @FXML
-    private TableColumn<Component, String> type;
+    private TableColumn<Components, String> type;
 
     @FXML
-    private TableColumn<Component, String> outline;
+    private TableColumn<Components, String> outline;
 
     @FXML
-    private TableColumn<Component, Float> posX;
+    private TableColumn<Components, Float> posX;
 
     @FXML
-    private TableColumn<Component, Float> posY;
+    private TableColumn<Components, Float> posY;
 
     @FXML
-    private TableColumn<Component, Float> rotation;
+    private TableColumn<Components, Float> rotation;
 
     @FXML
-    private TableColumn<Component, Boolean> flip;
+    private TableColumn<Components, Boolean> flip;
 
     @FXML
     public void initialize() {
@@ -166,7 +166,7 @@ public class MainController {
                 }
 
                 if (components.size() != 0) {
-                    componentsTable.setItems(FXCollections.<Component>observableArrayList(components));
+                    componentsTable.setItems(FXCollections.<Components>observableArrayList(components));
                 } else {
                     NotificationController.warningMsg("Componentes no encontrados",
                             "No hemos podido extraer los componentes. Comprueba que la placa tiene componentes.");
@@ -240,7 +240,7 @@ public class MainController {
     private void printTable() {
         PrinterJob printerJob = PrinterJob.createPrinterJob();
         if (printerJob != null && printerJob.showPrintDialog(primaryStage)) {
-            for (Component component : components) {
+            for (Components component : components) {
                 printerJob.printPage(component.getNode());
             }
             printerJob.endJob();

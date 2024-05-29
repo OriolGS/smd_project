@@ -8,7 +8,7 @@ import java.io.IOException;
 import com.smd.controller.NotificationController;
 import com.smd.gui.MainController;
 import com.smd.model.Board;
-import com.smd.model.Component;
+import com.smd.model.Components;
 import com.smd.model.ProgramType;
 
 import javafx.collections.FXCollections;
@@ -19,7 +19,7 @@ public class TxtFileReader {
     private static final String INITIAL_LINE_EXPECTED = ".PARTS";
     private static final String FINAL_LINE = ".ENDPARTS";
 
-    public static void read(File file, Label wordName, TableView<Component> componentsTable) {
+    public static void read(File file, Label wordName, TableView<Components> componentsTable) {
         BufferedReader br = null;
         String line = "";
         MainController.components.clear();
@@ -57,7 +57,7 @@ public class TxtFileReader {
 
     private static void extractComponent(String line, Board board) {
         String[] component = new String[7];
-        Component c;
+        Components c;
 
         String[] data = line.split("  ");
         component[0] = data[0].trim();
@@ -71,10 +71,10 @@ public class TxtFileReader {
         data = line.substring(component[4].length()).trim().split(" ");
 
         if (data.length == 1) {
-            c = new Component(component[0], board, component[1], component[2], component[3], component[4],
+            c = new Components(component[0], board, component[1], component[2], component[3], component[4],
                     data[0].trim(), false);
         } else {
-            c = new Component(component[0], board, component[1], component[2], component[3], component[4],
+            c = new Components(component[0], board, component[1], component[2], component[3], component[4],
                     data[1].trim(), true);
         }
 

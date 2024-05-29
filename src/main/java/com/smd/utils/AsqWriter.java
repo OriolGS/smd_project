@@ -4,7 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import com.smd.model.Component;
+import com.smd.model.Components;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -17,8 +17,8 @@ public class AsqWriter {
     private static final String FILE_NAME = "production1Maquina1.asq";
     private static String asqText = "";
 
-    public static void generate(ArrayList<Component> components) {
-        for (Component c : components) {
+    public static void generate(ArrayList<Components> components) {
+        for (Components c : components) {
             asqText += HASH + c.getIdentifier() + HASH + SEPARATOR + c.getPosX() + SEPARATOR + " " + c.getPosY() + " "
                     + c.getRotation() + SEPARATOR + CHUCK + HASH + HASH + SEPARATOR + HASH + c.getType() + " "
                     + c.getOutline() + " " + HASH + "1,T,#1#,0,F,#TAPE#,#X#,#" + c.isFlip() + "#,##,##,F";
