@@ -3,6 +3,7 @@ package com.smd.gui;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -21,13 +22,16 @@ import com.smd.utils.CsvFileReader;
 import com.smd.utils.CsvWriter;
 import com.smd.utils.TxtFileReader;
 
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.print.PrinterJob;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.FileChooser;
@@ -83,7 +87,6 @@ public class MainController {
     public void initialize() {
         this.wordNameLabel.setText("Bienvenido");
 
-        // comboBoxBoards = new ComboBox<String>();
         identifier.setCellValueFactory(new PropertyValueFactory<>("identifier"));
         type.setCellValueFactory(new PropertyValueFactory<>("type"));
         outline.setCellValueFactory(new PropertyValueFactory<>("outline"));
@@ -161,7 +164,7 @@ public class MainController {
                         components.addAll(board.getComponents());
                     }
                 }
-                
+
                 if (components.size() != 0) {
                     componentsTable.setItems(FXCollections.<Component>observableArrayList(components));
                 } else {
@@ -245,12 +248,11 @@ public class MainController {
         }
     }
 
-    @FXML
-    private void saveToDb() {
+    private void saveToDb(Board board) {
         Transaction transaction = null;
+
         try {
             session = sessionFactory.openSession();
-            Board board = components.get(0).getBoardFK();
             transaction = session.beginTransaction();
             session.save(board);
             transaction.commit();
@@ -266,6 +268,35 @@ public class MainController {
         }
 
         getBoardsFromDb();
+    }
+
+    @FXML
+    private void askBoardName() {
+        Board board = components.get(0).getBoardFK();
+        TextInputDialog dialog = new TextInputDialog(board.getBoardName());
+        dialog.setTitle("Información necesaria");
+        dialog.setHeaderText("Nombre de la placa");
+        dialog.setContentText("Introduce el nombre de la placa:");
+
+        Optional<String> result = dialog.showAndWait();
+
+        if (result.isPresent()) {
+            boolean existingName = false;
+            ObservableList<String> boardList = comboBoxBoards.getItems();
+            for (String boardName : boardList) {
+                if (result.get().equals(boardName)) {
+                    existingName = true;
+                }
+            }
+            if (!existingName) {
+                board.setBoardName(result.get());
+                saveToDb(board);
+            } else {
+                NotificationController.warningMsg("Nombre no válido",
+                        "La placa ya existe! Prueba a guardarla con otro nombre.");
+            }
+
+        }
     }
 
     public static void closeDb() {

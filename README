@@ -30,10 +30,6 @@ Asegúrate de tener instalado lo siguiente antes de comenzar:
 
 Relacionado con bbdd:
 
-- Detectar si una placa ya está en la base de datos con el nombre de esta
-
-- Al guardar, preguntar nombre de la placa
-
 - Implementar base de datos de phpMyAdmin
 
 - Implementar botón de cancelar + control habilitación botones
