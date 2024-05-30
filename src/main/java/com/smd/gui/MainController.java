@@ -18,7 +18,7 @@ import com.smd.controller.NotificationController;
 import com.smd.model.Board;
 import com.smd.model.Components;
 import com.smd.utils.AsqWriter;
-import com.smd.utils.CenterComponents;
+import com.smd.utils.ModifyComponents;
 import com.smd.utils.CsvFileReader;
 import com.smd.utils.CsvWriter;
 import com.smd.utils.TxtFileReader;
@@ -34,15 +34,12 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -355,19 +352,12 @@ public class MainController {
 
     @FXML
     private void centerOn() {
-        CenterComponents.showDialog(componentsTable);
+        ModifyComponents.centerComponents(componentsTable);
     }
 
-    // TODO: Meterlo dentro de misma clase que CenterComponents y cambiarle el nombre a algo más global?
-    public void flipBoard() {
-        // Flip the board by changing the sign of the X position of all components
-        for (Components component : components) {
-            component.setPosX(-component.getPosX());
-        }
-        // Refresh the components table
-        componentsTable.refresh();
-        // Show notification message
-        NotificationController.informationMsg("Proceso Completado", "La placa ha sido volteada.");
+   @FXML
+    private void flipBoard() {
+        ModifyComponents.flipBoard(componentsTable);
     }
 
     public void askForCancel() {

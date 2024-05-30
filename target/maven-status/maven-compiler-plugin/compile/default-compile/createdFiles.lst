@@ -6,6 +6,6 @@ com\smd\model\Board.class
 com\smd\utils\CsvFileReader.class
 com\smd\utils\TxtFileReader.class
 com\smd\model\Components.class
-com\smd\utils\CenterComponents.class
 com\smd\controller\NotificationController.class
+com\smd\utils\ModifyComponents.class
 com\smd\utils\AsqWriter.class

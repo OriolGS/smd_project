@@ -16,9 +16,20 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
 
-public class CenterComponents {
+public class ModifyComponents {
 
-    public static void showDialog(TableView<Components> componentsTable) {
+    public static void flipBoard(TableView<Components> componentsTable) {
+        // Flip the board by changing the sign of the X position of all components
+        for (Components component : MainController.components) {
+            component.setPosX(-component.getPosX());
+        }
+        // Refresh the components table
+        componentsTable.refresh();
+        // Show notification message
+        NotificationController.informationMsg("Proceso Completado", "La placa ha sido girada.");
+    }
+
+    public static void centerComponents(TableView<Components> componentsTable) {
         // Create the dialog
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Información necesaria");
