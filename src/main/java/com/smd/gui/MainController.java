@@ -1,5 +1,9 @@
 package com.smd.gui;
 
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.util.Pair;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,17 +31,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.print.PrinterJob;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.DirectoryChooser;
@@ -134,6 +128,8 @@ public class MainController {
             configuration = new Configuration().configure();
             sessionFactory = configuration.buildSessionFactory();
             session = sessionFactory.openSession();
+            String dbName = parseDatabaseNameFromUrl(configuration.getProperty("hibernate.connection.url"));
+            dbNameLabel.setText("Nombre de la base de datos: " + dbName);
         } catch (Exception e) {
         }
     }
@@ -191,6 +187,7 @@ public class MainController {
             }
 
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             NotificationController.errorMsg("Error", "No se han podido cargar los componentes.");
         }
     }
@@ -379,6 +376,89 @@ public class MainController {
             }
         });
     }
+
+
+    public void dbConfig(){
+        Dialog<Pair<String, Pair<String, String>>> dialog = new Dialog<>();
+        dialog.setTitle("Información necesaria");
+        dialog.setHeaderText("Introduce los credenciales de la base de datos");
+        // Botones de confirmación
+        ButtonType confirmButtonType = new ButtonType("Confirmar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
+
+        // Campos de texto para URL, usuario y contraseña
+        TextField urlField = new TextField();
+        urlField.setPromptText("URL");
+
+        TextField userField = new TextField();
+        userField.setPromptText("Usuario");
+
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Contraseña");
+
+        GridPane grid = new GridPane();
+        grid.add(new Label("URL:"), 0, 0);
+        grid.add(urlField, 1, 0);
+        grid.add(new Label("Usuario:"), 0, 1);
+        grid.add(userField, 1, 1);
+        grid.add(new Label("Contraseña:"), 0, 2);
+        grid.add(passwordField, 1, 2);
+
+        dialog.getDialogPane().setContent(grid);
+
+        // Convertir el resultado en un Pair<String, Pair<String, String>> cuando se haga clic en Confirmar
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == confirmButtonType) {
+                return new Pair<>(urlField.getText(), new Pair<>(userField.getText(), passwordField.getText()));
+            }
+            return null;
+        });
+
+        // Mostrar el diálogo y obtener el resultado
+        Optional<Pair<String, Pair<String, String>>> result = dialog.showAndWait();
+        // Si se proporcionan credenciales, intentar establecer la conexión
+        if (result.isPresent()) {
+            String url = result.get().getKey();
+            String username = result.get().getValue().getKey();
+            String password = result.get().getValue().getValue();
+
+            // Extract the database name from the URL
+            String dbName = parseDatabaseNameFromUrl(url);
+
+            Configuration config = new Configuration().configure();
+            config.setProperty("hibernate.connection.url", url);
+            config.setProperty("hibernate.connection.username", username);
+            config.setProperty("hibernate.connection.password", password);
+
+            try {
+                sessionFactory = config.buildSessionFactory();
+                session = sessionFactory.openSession();
+                getBoardsFromDb();
+                dbNameLabel.setText("Nombre de la base de datos: " + dbName);
+                // Mostrar mensaje de éxito
+                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                successAlert.setTitle("Conexión exitosa");
+                successAlert.setHeaderText("Conexión establecida correctamente");
+                successAlert.showAndWait();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                // Mostrar mensaje de error
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setTitle("Error de conexión");
+                errorAlert.setHeaderText("No se pudo conectar a la base de datos");
+                errorAlert.setContentText("Revise los credenciales de conexión y vuelva a intentarlo.");
+                errorAlert.showAndWait();
+            }
+        }
+    }
+
+    private String parseDatabaseNameFromUrl(String dbUrl) {
+        // Assuming the URL is of the format "jdbc:mysql://host:port/dbname"
+        String[] parts = dbUrl.split("/");
+        return parts.length > 3 ? parts[parts.length - 1] : "No se ha encontrado la base de datos";
+    }
+
 
     public static void closeDb() {
         try {

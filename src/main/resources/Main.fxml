@@ -34,7 +34,7 @@
         <Menu mnemonicParsing="false" text="Database">
           <items>
                   <MenuItem mnemonicParsing="false" onAction="#loadInfoFromDb" text="Reload" />
-            <MenuItem mnemonicParsing="false" text="Configuration" />
+            <MenuItem mnemonicParsing="false" onAction="#dbConfig" text="Configuration" />
           </items>
         </Menu>
             <Menu mnemonicParsing="false" text="PCB">
