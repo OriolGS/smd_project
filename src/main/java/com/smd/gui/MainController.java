@@ -18,23 +18,26 @@ import com.smd.controller.NotificationController;
 import com.smd.model.Board;
 import com.smd.model.Components;
 import com.smd.utils.AsqWriter;
+import com.smd.utils.CenterComponents;
 import com.smd.utils.CsvFileReader;
 import com.smd.utils.CsvWriter;
 import com.smd.utils.TxtFileReader;
 
-import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.print.PrinterJob;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -57,7 +60,7 @@ public class MainController {
     public static ArrayList<Components> components = new ArrayList<>();
     public static List<Board> boards;
 
-    public String selectedFolderPath = "";
+    private static File selectedFolder;
 
     @FXML
     private Label dbNameLabel;
@@ -112,6 +115,11 @@ public class MainController {
         posY.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
         rotation.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
         flip.setCellFactory(TextFieldTableCell.forTableColumn(new BooleanStringConverter()));
+
+        String userHome = System.getProperty("user.home");
+        String downloadsFolder = userHome + File.separator + "Downloads";
+        selectedFolder = new File(downloadsFolder);
+
         try {
             startDb();
             getBoardsFromDb();
@@ -194,13 +202,13 @@ public class MainController {
     private void handleOpenFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open File");
-        if (selectedFolderPath != "") {
-            fileChooser.setInitialDirectory(new File(selectedFolderPath));
-        } else {
-            fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        }
+        FileChooser.ExtensionFilter txtFilter = new FileChooser.ExtensionFilter("Text Files (*.txt)", "*.txt");
+        FileChooser.ExtensionFilter csvFilter = new FileChooser.ExtensionFilter("CSV Files (*.csv)", "*.csv");
+        fileChooser.getExtensionFilters().addAll(txtFilter, csvFilter);
+
+        fileChooser.setInitialDirectory(selectedFolder);
+
         File file = fileChooser.showOpenDialog(primaryStage);
-        // TODO: controlar el tipo de archivos que puede abrir
 
         if (file == null || !file.exists()) {
         } else if (file.length() == 0) {
@@ -225,40 +233,61 @@ public class MainController {
                 CsvFileReader.read(file, wordNameLabel, componentsTable);
                 break;
 
-            case ".asq":
-                // TODO: se necesita poder abrir este tipo?
-                wordNameLabel.setText("Archivo de la máquina 1: " + fileExtension);
-                break;
-
             default:
                 break;
         }
     }
 
     @FXML
-    private String setDefaultDirectory() {
+    private void setDefaultDirectory() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
-        directoryChooser.setTitle("Selecciona la carpeta por defecto");
-        File selectedDirectory = directoryChooser.showDialog(primaryStage);
-        if (selectedDirectory != null) {
-            selectedFolderPath = selectedDirectory.getAbsolutePath();
-            NotificationController.informationMsg("Proceso finalizado", "La carpeta por defecto ha sido seleccionada correctamente.");
-            selectedFolderPath = selectedFolderPath + "\\";
-            return selectedFolderPath;
-        } else {
-            NotificationController.warningMsg("Proceso cancelado", "No se ha seleccionado ninguna carpeta.");
-            return null;
-        }
+        directoryChooser.setInitialDirectory(selectedFolder);
+        directoryChooser.setTitle("Selecciona el directorio por defecto");
+
+        selectedFolder = directoryChooser.showDialog(primaryStage);
+
     }
 
     @FXML
     private void exportToAsq() {
-        AsqWriter.generate(components, selectedFolderPath);
+        String fileName = getFileName();
+        if (!fileName.equals("")) {
+            AsqWriter.generate(components, selectedFolder.getAbsolutePath() + File.separator + fileName);
+        }
     }
 
     @FXML
     private void exportToCsv() {
-        CsvWriter.generate(components, selectedFolderPath);
+        String fileName = getFileName();
+        if (!fileName.equals("")) {
+            CsvWriter.generate(components, selectedFolder.getAbsolutePath() + File.separator + fileName);
+        }
+    }
+
+    private String getFileName() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Información necesaria");
+        dialog.setHeaderText("Nombre del archivo");
+        dialog.setContentText("¿Cómo quieres que se llame el archivo?");
+
+        DialogPane dialogPane = dialog.getDialogPane();
+        Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
+
+        TextField textField = dialog.getEditor();
+
+        okButton.setDisable(true);
+
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            okButton.setDisable(newValue.trim().isEmpty());
+        });
+
+        Optional<String> result = dialog.showAndWait();
+
+        if (result.isPresent()) {
+            return result.get();
+        } else {
+            return "";
+        }
     }
 
     @FXML
@@ -325,114 +354,12 @@ public class MainController {
     }
 
     @FXML
-    private void CenterOn() {
-        // Create the dialog
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Información necesaria");
-        dialog.setHeaderText("¿Respecto a qué quieres centrar la placa?");
-        // Create the radio buttons and toggle group
-        RadioButton rbComponent = new RadioButton("Centrar respecto a un componente");
-        RadioButton rbPosition = new RadioButton("Centrar respecto a una posición");
-        ToggleGroup group = new ToggleGroup();
-        rbComponent.setToggleGroup(group);
-        rbPosition.setToggleGroup(group);
-        // Add radio buttons to a VBox
-        VBox vbox = new VBox(rbComponent, rbPosition);
-        dialog.getDialogPane().setContent(vbox);
-        // Add OK and Cancel buttons to the dialog
-        ButtonType okButtonType = new ButtonType("OK", ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
-        // Show the dialog and wait for a response
-        dialog.showAndWait().ifPresent(response -> {
-            if (response == okButtonType) {
-                if (rbComponent.isSelected()) {
-                    //Dialog for selecting a component
-                    Dialog<ButtonType> dialogComponent = new Dialog<>();
-                    dialogComponent.setTitle("Información necesaria");
-                    dialogComponent.setHeaderText("Selecciona un componente para centrar la placa");
-                    // Create the combo box
-                    ComboBox<String> comboBoxComponents = new ComboBox<>();
-                    for (Components component : components) {
-                        comboBoxComponents.getItems().add(component.getIdentifier());
-                    }
-                    // Add the combo box to the dialog
-                    dialogComponent.getDialogPane().setContent(comboBoxComponents);
-                    // Add OK and Cancel buttons to the dialog
-                    ButtonType okButtonTypeComponent = new ButtonType("OK", ButtonData.OK_DONE);
-                    dialogComponent.getDialogPane().getButtonTypes().addAll(okButtonTypeComponent, ButtonType.CANCEL);
-                    // Show the dialog and wait for a response
-                    dialogComponent.showAndWait().ifPresent(responseComponent -> {
-                        if (responseComponent == okButtonTypeComponent) {
-                            String selectedComponentId = comboBoxComponents.getValue();
-                            if (selectedComponentId != null) {
-                                Components selectedComponent = null;
-                                for (Components component : components) {
-                                    if (component.getIdentifier().equals(selectedComponentId)) {
-                                        selectedComponent = component;
-                                        break;
-                                    }
-                                }
-                                if (selectedComponent != null) {
-                                    // Save the previous position of the selected component
-                                    float oldPosX = selectedComponent.getPosX();
-                                    float oldPosY = selectedComponent.getPosY();
-                                    // Move the selected component to the center of the board (0,0)
-                                    selectedComponent.setPosX(0.0f);
-                                    selectedComponent.setPosY(0.0f);
-                                    // Adjust the positions of the other components relative to the centered component
-                                    for (Components otherComponent : components) {
-                                        if (!otherComponent.getIdentifier().equals(selectedComponentId)) {
-                                            otherComponent.setPosX(otherComponent.getPosX() - oldPosX);
-                                            otherComponent.setPosY(otherComponent.getPosY() - oldPosY);
-                                        }
-                                    }
-                                    // Refresh the components table
-                                    componentsTable.refresh();
-                                    // Show notification message
-                                    NotificationController.informationMsg("Proceso Completado", "El componente " + selectedComponentId + " ha sido centrado en la placa.");
-                                }
-                            }
-                        }
-                    });
-                } else if (rbPosition.isSelected()) {
-                    //Dialog for selecting a position
-                    Dialog<ButtonType> dialogPosition = new Dialog<>();
-                    dialogPosition.setTitle("Información necesaria");
-                    dialogPosition.setHeaderText("Introduce la posición a la que quieres centrar la placa");
-                    // Create the text input fields
-                    TextInputDialog dialog2 = new TextInputDialog();
-                    dialog2.setTitle("Información necesaria");
-                    dialog2.setHeaderText("Introduce la posición a la que quieres centrar la placa");
-                    dialog2.setContentText("Introduce la posición X:");
-                    Optional<String> resultX = dialog2.showAndWait();
-                    dialog2.setContentText("Introduce la posición Y:");
-                    Optional<String> resultY = dialog2.showAndWait();
-                    if (resultX.isPresent() && resultY.isPresent()) {
-                        try {
-                            float posX = Float.parseFloat(resultX.get());
-                            float posY = Float.parseFloat(resultY.get());
-                            // Save the previous position of the selected component
-                            float oldPosX = posX;
-                            float oldPosY = posY;
-                            // Move the selected component to the center of the board (0,0)
-                            for (Components component : components) {
-                                component.setPosX(component.getPosX() - oldPosX);
-                                component.setPosY(component.getPosY() - oldPosY);
-                            }
-                            // Refresh the components table
-                            componentsTable.refresh();
-                            // Show notification message
-                            NotificationController.informationMsg("Proceso Completado", "La placa ha sido centrada en la posición (" + posX + ", " + posY + ").");
-                        } catch (NumberFormatException e) {
-                            NotificationController.errorMsg("Error", "Las posiciones deben ser números.");
-                        }
-                    }
-                }
-            }
-        });
+    private void centerOn() {
+        CenterComponents.showDialog(componentsTable);
     }
 
-    public void FlipBoard() {
+    // TODO: Meterlo dentro de misma clase que CenterComponents y cambiarle el nombre a algo más global?
+    public void flipBoard() {
         // Flip the board by changing the sign of the X position of all components
         for (Components component : components) {
             component.setPosX(-component.getPosX());
@@ -454,7 +381,7 @@ public class MainController {
         // Show the dialog and wait for a response
         dialog.showAndWait().ifPresent(response -> {
             if (response == okButtonType) {
-                //empty table
+                // empty table
                 components.clear();
                 componentsTable.setItems(FXCollections.<Components>observableArrayList(components));
                 // Show notification message

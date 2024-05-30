@@ -39,15 +39,11 @@ Relacionado con bbdd:
 
 Otras funcionalidades:
 
-- Centrar componentes
-
-- Girar placa
-
-- Añadir funcionalidad de directorio en el que exportar
+- Empezar a centrar siempre desde 0,0
 
 - Mirar si cambiar la forma en la que se imprimen los componentes
 
-- Preguntar el nombre de la placa
+- Gestionar estados de los botones 
 
 - Permitir dos archivos de csv para la misma placa
 

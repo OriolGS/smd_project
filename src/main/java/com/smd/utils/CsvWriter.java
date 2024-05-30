@@ -12,13 +12,9 @@ import javafx.scene.control.Alert.AlertType;
 public class CsvWriter {
     private static final String COLUMNS_HEADER = "Designator,NozzleNum,StackNum,Mid X,Mid";
     private static final String SEPARATOR = ",";
-    // TODO: cambiar cómo se consigue el nombre del archivo
-    private static String FILE_NAME = "production1Maquina2.csv";
     private static String csvText;
 
-    public static void generate(ArrayList<Components> components, String directoryPath) {
-        FILE_NAME = directoryPath + FILE_NAME;
-        System.out.println(FILE_NAME);
+    public static void generate(ArrayList<Components> components, String path) {
         csvText = COLUMNS_HEADER;
         csvText += "\n";
 
@@ -30,14 +26,14 @@ public class CsvWriter {
 
         FileWriter fw = null;
         try {
-            fw = new FileWriter(FILE_NAME);
+            fw = new FileWriter(path + ".csv");
             fw.write(csvText);
             fw.close();
 
             Alert alert = new Alert(AlertType.CONFIRMATION);
             alert.setTitle("Archivo creado correctamente");
             alert.setHeaderText("El archivo se ha creado en:");
-            alert.setContentText(FILE_NAME);
+            alert.setContentText(path + ".csv");
             alert.getButtonTypes().remove(1);
             alert.show();
         } catch (IOException e) {

@@ -37,10 +37,10 @@
             <MenuItem mnemonicParsing="false" text="Configuration" />
           </items>
         </Menu>
-            <Menu mnemonicParsing="false" text="PBC">
+            <Menu mnemonicParsing="false" text="PCB">
               <items>
-                <MenuItem mnemonicParsing="false" onAction="#CenterOn" text="Center" />
-                <MenuItem mnemonicParsing="false" onAction="#FlipBoard" text="Flip board" />
+                <MenuItem mnemonicParsing="false" onAction="#centerOn" text="Center" />
+                <MenuItem mnemonicParsing="false" onAction="#flipBoard" text="Flip board" />
               </items>
             </Menu>
         <Menu mnemonicParsing="false" text="Help">

@@ -4,9 +4,6 @@
     <session-factory>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
         <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
-        <!-- <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/smd_db</property>
-        <property name="hibernate.connection.username">smdUser</property>
-        <property name="hibernate.connection.password">usuari</property> -->
         <property name="hibernate.connection.url">jdbc:mysql://db.fmesasc.com:3306/daw2</property>
         <property name="hibernate.connection.username">daw2</property>
         <property name="hibernate.connection.password">Gimbernat1</property>

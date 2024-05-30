@@ -3,7 +3,6 @@ package com.smd.utils;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import com.smd.model.Components;
 
 import javafx.scene.control.Alert;
@@ -13,12 +12,10 @@ public class AsqWriter {
     private static final String HASH = "#";
     private static final String SEPARATOR = ",";
     private static final String CHUCK = HASH + "PXY" + HASH + SEPARATOR;
-    // TODO: cambiar cómo se consigue el nombre del archivo
-    private static  String FILE_NAME = "production1Maquina1.asq";
+
     private static String asqText = "";
 
-    public static void generate(ArrayList<Components> components, String directoryPath) {
-        FILE_NAME = directoryPath + FILE_NAME;
+    public static void generate(ArrayList<Components> components, String path) {
         for (Components c : components) {
             asqText += HASH + c.getIdentifier() + HASH + SEPARATOR + c.getPosX() + SEPARATOR + " " + c.getPosY() + " "
                     + c.getRotation() + SEPARATOR + CHUCK + HASH + HASH + SEPARATOR + HASH + c.getType() + " "
@@ -29,14 +26,14 @@ public class AsqWriter {
 
         FileWriter fw = null;
         try {
-            fw = new FileWriter(FILE_NAME);
+            fw = new FileWriter(path + ".asq");
             fw.write(asqText);
             fw.close();
 
             Alert alert = new Alert(AlertType.CONFIRMATION);
             alert.setTitle("Archivo creado correctamente");
             alert.setHeaderText("El archivo se ha creado en:");
-            alert.setContentText(FILE_NAME);
+            alert.setContentText(path + ".asq");
             alert.getButtonTypes().remove(1);
             alert.show();
         } catch (IOException e) {
@@ -48,4 +45,5 @@ public class AsqWriter {
             alert.show();
         }
     }
+
 }
