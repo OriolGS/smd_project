@@ -1,5 +1,7 @@
 package com.smd.utils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Optional;
 
 import com.smd.controller.NotificationController;
@@ -18,10 +20,16 @@ import javafx.scene.layout.VBox;
 
 public class ModifyComponents {
 
+    private static float cumulativePosX = 0;
+    private static float cumulativePosY = 0;
+
+    private static float componentPosX = 0;
+    private static float componentPosY = 0;
+
     public static void flipBoard(TableView<Components> componentsTable) {
         // Flip the board by changing the sign of the X position of all components
         for (Components component : MainController.components) {
-            component.setPosX(-component.getPosX());
+            component.setPosX(-round(component.getPosX(),3));
         }
         // Refresh the components table
         componentsTable.refresh();
@@ -77,14 +85,17 @@ public class ModifyComponents {
             try {
                 float posX = Float.parseFloat(resultX.get());
                 float posY = Float.parseFloat(resultY.get());
-                // Save the previous position of the selected component
-                float oldPosX = posX;
-                float oldPosY = posY;
-                // Move the selected component to the center of the board (0,0)
+                // Move the components based on the new cumulative positions
                 for (Components component : MainController.components) {
-                    component.setPosX(component.getPosX() - oldPosX);
-                    component.setPosY(component.getPosY() - oldPosY);
+                    component.setPosX(round(component.getPosX() - posX + cumulativePosX + componentPosX, 3));
+                    component.setPosY(round(component.getPosY() - posY + cumulativePosY + componentPosY, 3));
                 }
+                //Reset the component positions
+                componentPosX = 0;
+                componentPosY = 0;
+                // Update the cumulative positions
+                cumulativePosX = posX;
+                cumulativePosY = posY;
                 // Refresh the components table
                 componentsTable.refresh();
                 // Show notification message
@@ -144,15 +155,26 @@ public class ModifyComponents {
             // component
             for (Components otherComponent : MainController.components) {
                 if (!otherComponent.getIdentifier().equals(selectedComponentId)) {
-                    otherComponent.setPosX(otherComponent.getPosX() - oldPosX);
-                    otherComponent.setPosY(otherComponent.getPosY() - oldPosY);
+                    otherComponent.setPosX(round(otherComponent.getPosX() - oldPosX,3));
+                    otherComponent.setPosY(round(otherComponent.getPosY() - oldPosY,3));
                 }
             }
+            componentPosX += oldPosX;
+            componentPosY += oldPosY;
             // Refresh the components table
             componentsTable.refresh();
             // Show notification message
             NotificationController.informationMsg("Proceso Completado",
                     "El componente " + selectedComponentId + " ha sido centrado en la placa.");
         }
+    }
+
+    // Utility method to round a float to a specific number of decimal places
+    private static float round(float value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(Float.toString(value));
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.floatValue();
     }
 }
