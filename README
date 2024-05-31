@@ -32,17 +32,18 @@ Otras funcionalidades:
 
 - Modificar que cuando una placa esté girada en la coordenada -0 torni a la 0.
 
-- Mostrar nombre de la base de datos
-
 - Permitir dos archivos de csv para la misma placa
 
 - Exportar dos archivos siempre (uno por cada cara)
 
 - Mirar si cambiar la forma en la que se imprimen los componentes
 
+- Cambiar idioma
+
 - Añadir un process indicator para ciertos procesos
 
 - Mejorar método para controlar el cierre de la aplicación (comprobar si hay algo a medias, cerrar sesiones a base de datos...)
+
 
 Funcionalidades de info:
 - Crear manual

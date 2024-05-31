@@ -24,7 +24,6 @@ public class TxtFileReader {
     public static void read(File file, TableView<Components> componentsTable, Button cancelButton, Button saveButton) {
         BufferedReader br = null;
         String line = "";
-        // MainController.components.clear();
 
         Board board = generateBoard(file.getName());
 

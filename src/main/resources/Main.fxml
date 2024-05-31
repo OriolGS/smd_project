@@ -33,7 +33,7 @@
         </Menu>
         <Menu mnemonicParsing="false" text="Database">
           <items>
-                  <MenuItem mnemonicParsing="false" onAction="#loadInfoFromDb" text="Reload" />
+                  <MenuItem fx:id="reloadDb" mnemonicParsing="false" onAction="#reloadDb" text="Reload" />
             <MenuItem mnemonicParsing="false" onAction="#dbConfig" text="Configuration" />
           </items>
         </Menu>

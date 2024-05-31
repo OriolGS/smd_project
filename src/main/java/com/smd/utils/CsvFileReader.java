@@ -23,7 +23,6 @@ public class CsvFileReader {
 
     public static void read(File file, TableView<Components> componentsTable, Button cancelButton, Button saveButton) {
         BufferedReader br = null;
-        // MainController.components.clear();
 
         Board board = generateBoard(file.getName());
 

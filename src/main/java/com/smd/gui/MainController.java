@@ -133,7 +133,6 @@ public class MainController {
         statesThread = new Thread(stateController);
 
         statesThread.start();
-
     }
 
     private void onCellEdit(TableColumn.CellEditEvent<Components, ?> event) {
@@ -146,15 +145,11 @@ public class MainController {
 
     // TODO: plantearme si hacer una clase para controlar conexiones con bbdd
     private void startDb() throws Exception {
-        try {
-            configuration = new Configuration().configure();
-            sessionFactory = configuration.buildSessionFactory();
-            session = sessionFactory.openSession();
-            String dbNameString = parseDatabaseNameFromUrl(configuration.getProperty("hibernate.connection.url"));
-            dbName.setText("Nombre de la base de datos: " + dbNameString);
-        } catch (Exception e) {
-        }
-
+        configuration = new Configuration().configure();
+        sessionFactory = configuration.buildSessionFactory();
+        session = sessionFactory.openSession();
+        String dbNameString = parseDatabaseNameFromUrl(configuration.getProperty("hibernate.connection.url"));
+        dbName.setText("Nombre de la base de datos: " + dbNameString);
     }
 
     private void getBoardsFromDb() {
@@ -178,8 +173,6 @@ public class MainController {
 
     @FXML
     private void reloadDb() {
-        // components.clear();
-        // boards.clear();
         try {
             session = sessionFactory.openSession();
             CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -476,8 +469,7 @@ public class MainController {
         });
     }
 
-
-    public void dbConfig(){
+    public void dbConfig() {
         Dialog<Pair<String, Pair<String, String>>> dialog = new Dialog<>();
         dialog.setTitle("Información necesaria");
         dialog.setHeaderText("Introduce los credenciales de la base de datos");
@@ -505,7 +497,8 @@ public class MainController {
 
         dialog.getDialogPane().setContent(grid);
 
-        // Convertir el resultado en un Pair<String, Pair<String, String>> cuando se haga clic en Confirmar
+        // Convertir el resultado en un Pair<String, Pair<String, String>> cuando se
+        // haga clic en Confirmar
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
                 return new Pair<>(urlField.getText(), new Pair<>(userField.getText(), passwordField.getText()));
@@ -539,6 +532,9 @@ public class MainController {
                 successAlert.setTitle("Conexión exitosa");
                 successAlert.setHeaderText("Conexión establecida correctamente");
                 successAlert.showAndWait();
+                reloadDb.setDisable(false);
+                comboBoxBoards.setDisable(false);
+                loadBoard.setDisable(false);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -557,7 +553,6 @@ public class MainController {
         String[] parts = dbUrl.split("/");
         return parts.length > 3 ? parts[parts.length - 1] : "No se ha encontrado la base de datos";
     }
-
 
     public static void closeDb() {
         try {
