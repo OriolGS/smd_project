@@ -1,5 +1,6 @@
 package com.smd.gui;
 
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 
@@ -29,21 +30,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.print.PrinterJob;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.DirectoryChooser;
@@ -163,6 +150,8 @@ public class MainController {
             configuration = new Configuration().configure();
             sessionFactory = configuration.buildSessionFactory();
             session = sessionFactory.openSession();
+            String dbName = parseDatabaseNameFromUrl(configuration.getProperty("hibernate.connection.url"));
+            dbNameLabel.setText("Nombre de la base de datos: " + dbName);
         } catch (Exception e) {
         }
 
@@ -252,6 +241,7 @@ public class MainController {
             }
 
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             NotificationController.errorMsg("Error", "No se han podido cargar los componentes.");
         }
     }
@@ -486,6 +476,7 @@ public class MainController {
         });
     }
 
+
     public void dbConfig(){
         Dialog<Pair<String, Pair<String, String>>> dialog = new Dialog<>();
         dialog.setTitle("Información necesaria");
@@ -531,7 +522,7 @@ public class MainController {
             String password = result.get().getValue().getValue();
 
             // Extract the database name from the URL
-            String dbNameString = parseDatabaseNameFromUrl(url);
+            String dbName = parseDatabaseNameFromUrl(url);
 
             Configuration config = new Configuration().configure();
             config.setProperty("hibernate.connection.url", url);
@@ -542,7 +533,7 @@ public class MainController {
                 sessionFactory = config.buildSessionFactory();
                 session = sessionFactory.openSession();
                 getBoardsFromDb();
-                dbName.setText("Nombre de la base de datos: " + dbNameString);
+                dbNameLabel.setText("Nombre de la base de datos: " + dbName);
                 // Mostrar mensaje de éxito
                 Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
                 successAlert.setTitle("Conexión exitosa");
@@ -566,6 +557,7 @@ public class MainController {
         String[] parts = dbUrl.split("/");
         return parts.length > 3 ? parts[parts.length - 1] : "No se ha encontrado la base de datos";
     }
+
 
     public static void closeDb() {
         try {
