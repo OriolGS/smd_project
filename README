@@ -40,8 +40,6 @@ Otras funcionalidades:
 
 - Cambiar idioma
 
-- Añadir un process indicator para ciertos procesos
-
 - Mejorar método para controlar el cierre de la aplicación (comprobar si hay algo a medias, cerrar sesiones a base de datos...)
 
 
