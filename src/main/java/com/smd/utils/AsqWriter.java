@@ -3,6 +3,7 @@ package com.smd.utils;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import com.smd.model.Components;
 
 import javafx.scene.control.Alert;
@@ -17,7 +18,8 @@ public class AsqWriter {
 
     public static void generate(ArrayList<Components> components, String path) {
         for (Components c : components) {
-            asqText += HASH + c.getIdentifier() + HASH + SEPARATOR + c.getPosX() + SEPARATOR + " " + c.getPosY() + " "
+            asqText += HASH + c.getIdentifier() + HASH + SEPARATOR + c.getPosX() + SEPARATOR + " " + c.getPosY()
+                    + " "
                     + c.getRotation() + SEPARATOR + CHUCK + HASH + HASH + SEPARATOR + HASH + c.getType() + " "
                     + c.getOutline() + " " + HASH + "1,T,#1#,0,F,#TAPE#,#X#,#" + c.isFlip() + "#,##,##,F";
 
@@ -45,5 +47,4 @@ public class AsqWriter {
             alert.show();
         }
     }
-
 }

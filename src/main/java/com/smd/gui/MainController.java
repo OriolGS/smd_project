@@ -1,5 +1,8 @@
 package com.smd.gui;
 
+import javafx.scene.layout.GridPane;
+import javafx.util.Pair;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,12 +11,11 @@ import java.util.Optional;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-
+import com.smd.controller.EmptyTableController;
 import com.smd.controller.NotificationController;
 import com.smd.model.Board;
 import com.smd.model.Components;
@@ -27,13 +29,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.print.PrinterJob;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -50,52 +56,49 @@ public class MainController {
 
     private Stage primaryStage;
 
+    private static Thread statesThread;
+    private static EmptyTableController stateController;
+
     private static Configuration configuration;
     private static SessionFactory sessionFactory;
     private static Session session;
 
     public static ArrayList<Components> components = new ArrayList<>();
+    public static List<Components> originalComponents = new ArrayList<>();
     public static List<Board> boards;
 
     private static File selectedFolder;
 
-    @FXML
-    private Label dbNameLabel;
+    public static boolean isModifying = false;
+
+    private ModifyComponents modifyComponents;
 
     @FXML
-    private Label wordNameLabel;
+    private MenuItem exportToAsq, exportToCsv, printBoard, reloadDb, centerComponent, flipBoard;
+
+    @FXML
+    private Label dbName;
 
     @FXML
     private ComboBox<String> comboBoxBoards;
 
     @FXML
+    private Button loadBoard, cancelButton, saveButton;
+
+    @FXML
     private TableView<Components> componentsTable;
 
     @FXML
-    private TableColumn<Components, String> identifier;
+    private TableColumn<Components, String> identifier, type, outline;
 
     @FXML
-    private TableColumn<Components, String> type;
-
-    @FXML
-    private TableColumn<Components, String> outline;
-
-    @FXML
-    private TableColumn<Components, Float> posX;
-
-    @FXML
-    private TableColumn<Components, Float> posY;
-
-    @FXML
-    private TableColumn<Components, Float> rotation;
+    private TableColumn<Components, Float> posX, posY, rotation;
 
     @FXML
     private TableColumn<Components, Boolean> flip;
 
     @FXML
     public void initialize() {
-        this.wordNameLabel.setText("Bienvenido");
-
         identifier.setCellValueFactory(new PropertyValueFactory<>("identifier"));
         type.setCellValueFactory(new PropertyValueFactory<>("type"));
         outline.setCellValueFactory(new PropertyValueFactory<>("outline"));
@@ -106,12 +109,19 @@ public class MainController {
 
         // Hace las columnas editables
         identifier.setCellFactory(TextFieldTableCell.forTableColumn());
+        identifier.setOnEditCommit(event -> onCellEdit(event));
         type.setCellFactory(TextFieldTableCell.forTableColumn());
+        type.setOnEditCommit(event -> onCellEdit(event));
         outline.setCellFactory(TextFieldTableCell.forTableColumn());
+        outline.setOnEditCommit(event -> onCellEdit(event));
         posX.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
+        posX.setOnEditCommit(event -> onCellEdit(event));
         posY.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
+        posY.setOnEditCommit(event -> onCellEdit(event));
         rotation.setCellFactory(TextFieldTableCell.forTableColumn(new FloatStringConverter()));
+        rotation.setOnEditCommit(event -> onCellEdit(event));
         flip.setCellFactory(TextFieldTableCell.forTableColumn(new BooleanStringConverter()));
+        flip.setOnEditCommit(event -> onCellEdit(event));
 
         String userHome = System.getProperty("user.home");
         String downloadsFolder = userHome + File.separator + "Downloads";
@@ -121,11 +131,30 @@ public class MainController {
             startDb();
             getBoardsFromDb();
         } catch (Exception e) {
-            // TODO: mirar cómo gestionar el error, no se puede mostrar con alerta ni
-            // notificación porque aún no existe la pantalla
-            wordNameLabel.setText("No se pudo conectar a la base de datos.");
-            e.printStackTrace();
+            dbName.setText("No se pudo conectar a la base de datos.");
+            reloadDb.setDisable(true);
+            comboBoxBoards.setDisable(true);
+            loadBoard.setDisable(true);
         }
+
+        saveButton.setDisable(true);
+        cancelButton.setDisable(true);
+        modifyComponents = new ModifyComponents(cancelButton, saveButton);
+
+        stateController = new EmptyTableController(componentsTable, exportToAsq, exportToCsv,
+                printBoard, centerComponent, flipBoard);
+        statesThread = new Thread(stateController);
+
+        statesThread.start();
+
+    }
+
+    private void onCellEdit(TableColumn.CellEditEvent<Components, ?> event) {
+        // Enable the save button when a cell is edited
+        isModifying = true;
+        saveButton.setText("Modify");
+        saveButton.setDisable(false);
+        cancelButton.setDisable(false);
     }
 
     // TODO: plantearme si hacer una clase para controlar conexiones con bbdd
@@ -136,6 +165,7 @@ public class MainController {
             session = sessionFactory.openSession();
         } catch (Exception e) {
         }
+
     }
 
     private void getBoardsFromDb() {
@@ -153,14 +183,14 @@ public class MainController {
                 comboBoxBoards.getItems().add(board.getBoardName());
             }
         } else {
-            dbNameLabel.setText("No se ha encontrado la base de datos");
+            dbName.setText("No se ha encontrado la base de datos");
         }
     }
 
     @FXML
-    private void loadInfoFromDb() {
-        components.clear();
-        boards.clear();
+    private void reloadDb() {
+        // components.clear();
+        // boards.clear();
         try {
             session = sessionFactory.openSession();
             CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -168,11 +198,34 @@ public class MainController {
             Root<Board> root = criteriaQuery.from(Board.class);
             criteriaQuery.select(root);
 
+            boards.clear();
             boards = session.createQuery(criteriaQuery).getResultList();
 
+            componentsTable.getItems().clear();
+            components.clear();
+            originalComponents.clear();
+
+            NotificationController.informationMsg("Base de datos recargada", "Selecciona la placa que quieres ver.");
+        } catch (Exception e) {
+            NotificationController.errorMsg("Error", "No se han podido cargar los componentes.");
+        }
+    }
+
+    @FXML
+    private void loadInfoFromDb() {
+        try {
+            session = sessionFactory.openSession();
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Board> criteriaQuery = builder.createQuery(Board.class);
+            Root<Board> root = criteriaQuery.from(Board.class);
+            criteriaQuery.select(root);
+
+            boards.clear();
+            boards = session.createQuery(criteriaQuery).getResultList();
             String boardName = comboBoxBoards.getSelectionModel().isEmpty() ? "" : comboBoxBoards.getValue();
 
             if (boardName != "") {
+                components.clear();
                 for (Board board : boards) {
                     if (boardName.equals(board.getBoardName())) {
                         components.addAll(board.getComponents());
@@ -181,9 +234,17 @@ public class MainController {
 
                 if (components.size() != 0) {
                     componentsTable.setItems(FXCollections.<Components>observableArrayList(components));
+                    originalComponents = new ArrayList<>();
+                    for (Components component : MainController.components) {
+                        originalComponents.add(new Components(component));
+                    }
                 } else {
                     NotificationController.warningMsg("Componentes no encontrados",
                             "No hemos podido extraer los componentes. Comprueba que la placa tiene componentes.");
+                    // Sincroniza de nuevo la tabla con la lista de componentes
+                    ObservableList<Components> observableComponents = componentsTable.getItems();
+                    ArrayList<Components> componentsList = new ArrayList<>(observableComponents);
+                    components = componentsList;
                 }
             } else {
                 NotificationController.informationMsg("Escoge una placa",
@@ -216,18 +277,16 @@ public class MainController {
     }
 
     private void openFile(File file) {
-        wordNameLabel.setText(file.getName());
-
         int extensionIndex = file.getName().lastIndexOf('.');
         String fileExtension = file.getName().substring(extensionIndex);
 
         switch (fileExtension) {
             case ".txt":
-                TxtFileReader.read(file, wordNameLabel, componentsTable);
+                TxtFileReader.read(file, componentsTable, cancelButton, saveButton);
                 break;
 
             case ".csv":
-                CsvFileReader.read(file, wordNameLabel, componentsTable);
+                CsvFileReader.read(file, componentsTable, cancelButton, saveButton);
                 break;
 
             default:
@@ -295,7 +354,46 @@ public class MainController {
                 printerJob.printPage(component.getNode());
             }
             printerJob.endJob();
-            NotificationController.informationMsg("Proceso finalizado", "El contenido de la tabla ha sido imprimido.");
+            NotificationController.informationMsg("Proceso finalizado",
+                    "El contenido de la tabla ha sido imprimido.");
+        }
+    }
+
+    @FXML
+    private void askBoardName() {
+        Board board = components.get(0).getBoardFK();
+        if (!isModifying) {
+            TextInputDialog dialog = new TextInputDialog(board.getBoardName());
+            dialog.setTitle("Información necesaria");
+            dialog.setHeaderText("Nombre de la placa");
+            dialog.setContentText("Introduce el nombre de la placa:");
+
+            Optional<String> result = dialog.showAndWait();
+
+            if (result.isPresent()) {
+                boolean existingName = false;
+                ObservableList<String> boardList = comboBoxBoards.getItems();
+                for (String boardName : boardList) {
+                    if (result.get().equals(boardName)) {
+                        existingName = true;
+                    }
+                }
+                if (!existingName) {
+                    board.setBoardName(result.get());
+                    saveToDb(board);
+                } else {
+                    NotificationController.warningMsg("Nombre no válido",
+                            "La placa ya existe! Prueba a guardarla con otro nombre.");
+                }
+
+            }
+        } else {
+            if (board != null) {
+                saveToDb(board);
+            } else {
+                NotificationController.errorMsg("Error al actualizar",
+                        "No hemos encontrado la placa en la base de datos.");
+            }
         }
     }
 
@@ -305,59 +403,57 @@ public class MainController {
         try {
             session = sessionFactory.openSession();
             transaction = session.beginTransaction();
-            session.save(board);
+
+            if (isModifying) {
+                ObservableList<Components> observableComponents = componentsTable.getItems();
+                ArrayList<Components> componentsList = new ArrayList<>(observableComponents);
+                board.setComponents(componentsList);
+
+                session.update(board);
+
+                NotificationController.informationMsg("Proceso finalizado",
+                        "La placa " + board.getBoardName() + " y sus componentes se han actualizado correctamente.");
+
+            } else {
+                session.save(board);
+
+                NotificationController.informationMsg("Proceso finalizado",
+                        "La placa " + board.getBoardName() + " y sus componentes se han guardado correctamente.");
+            }
+
             transaction.commit();
 
-            NotificationController.informationMsg("Proceso finalizado",
-                    "La placa " + board.getBoardName() + " y sus componentes se ha guardado correctamente.");
+            saveButton.setDisable(true);
+            cancelButton.setDisable(true);
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
+            e.printStackTrace();
             NotificationController.errorMsg("Error al guardar",
-                    "Lo sentimos, no se ha podido guardar los datos en la base de datos");
+                    "Lo sentimos, no se ha podido guardar los datos en la base de datos.");
         }
 
         getBoardsFromDb();
     }
 
     @FXML
-    private void askBoardName() {
-        Board board = components.get(0).getBoardFK();
-        TextInputDialog dialog = new TextInputDialog(board.getBoardName());
-        dialog.setTitle("Información necesaria");
-        dialog.setHeaderText("Nombre de la placa");
-        dialog.setContentText("Introduce el nombre de la placa:");
-
-        Optional<String> result = dialog.showAndWait();
-
-        if (result.isPresent()) {
-            boolean existingName = false;
-            ObservableList<String> boardList = comboBoxBoards.getItems();
-            for (String boardName : boardList) {
-                if (result.get().equals(boardName)) {
-                    existingName = true;
-                }
-            }
-            if (!existingName) {
-                board.setBoardName(result.get());
-                saveToDb(board);
-            } else {
-                NotificationController.warningMsg("Nombre no válido",
-                        "La placa ya existe! Prueba a guardarla con otro nombre.");
-            }
-
+    private void centerOn() {
+        originalComponents = new ArrayList<>();
+        for (Components component : MainController.components) {
+            originalComponents.add(new Components(component));
         }
+
+        modifyComponents.centerComponents(componentsTable);
     }
 
     @FXML
-    private void centerOn() {
-        ModifyComponents.centerComponents(componentsTable);
-    }
-
-   @FXML
     private void flipBoard() {
-        ModifyComponents.flipBoard(componentsTable);
+        originalComponents = new ArrayList<>();
+        for (Components component : MainController.components) {
+            originalComponents.add(new Components(component));
+        }
+        modifyComponents.flipBoard(componentsTable);
     }
 
     public void askForCancel() {
@@ -371,13 +467,104 @@ public class MainController {
         // Show the dialog and wait for a response
         dialog.showAndWait().ifPresent(response -> {
             if (response == okButtonType) {
-                // empty table
-                components.clear();
-                componentsTable.setItems(FXCollections.<Components>observableArrayList(components));
+                if (isModifying) {
+                    componentsTable.getItems().clear();
+                    components = new ArrayList<>(originalComponents);
+                    componentsTable.setItems(FXCollections.<Components>observableArrayList(components));
+
+                } else {
+                    // empty table
+                    components.clear();
+                    componentsTable.getItems().clear();
+                }
+
                 // Show notification message
                 NotificationController.informationMsg("Proceso Cancelado", "El proceso ha sido cancelado.");
+                saveButton.setDisable(true);
+                cancelButton.setDisable(true);
             }
         });
+    }
+
+    public void dbConfig(){
+        Dialog<Pair<String, Pair<String, String>>> dialog = new Dialog<>();
+        dialog.setTitle("Información necesaria");
+        dialog.setHeaderText("Introduce los credenciales de la base de datos");
+        // Botones de confirmación
+        ButtonType confirmButtonType = new ButtonType("Confirmar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
+
+        // Campos de texto para URL, usuario y contraseña
+        TextField urlField = new TextField();
+        urlField.setPromptText("URL");
+
+        TextField userField = new TextField();
+        userField.setPromptText("Usuario");
+
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Contraseña");
+
+        GridPane grid = new GridPane();
+        grid.add(new Label("URL:"), 0, 0);
+        grid.add(urlField, 1, 0);
+        grid.add(new Label("Usuario:"), 0, 1);
+        grid.add(userField, 1, 1);
+        grid.add(new Label("Contraseña:"), 0, 2);
+        grid.add(passwordField, 1, 2);
+
+        dialog.getDialogPane().setContent(grid);
+
+        // Convertir el resultado en un Pair<String, Pair<String, String>> cuando se haga clic en Confirmar
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == confirmButtonType) {
+                return new Pair<>(urlField.getText(), new Pair<>(userField.getText(), passwordField.getText()));
+            }
+            return null;
+        });
+
+        // Mostrar el diálogo y obtener el resultado
+        Optional<Pair<String, Pair<String, String>>> result = dialog.showAndWait();
+        // Si se proporcionan credenciales, intentar establecer la conexión
+        if (result.isPresent()) {
+            String url = result.get().getKey();
+            String username = result.get().getValue().getKey();
+            String password = result.get().getValue().getValue();
+
+            // Extract the database name from the URL
+            String dbNameString = parseDatabaseNameFromUrl(url);
+
+            Configuration config = new Configuration().configure();
+            config.setProperty("hibernate.connection.url", url);
+            config.setProperty("hibernate.connection.username", username);
+            config.setProperty("hibernate.connection.password", password);
+
+            try {
+                sessionFactory = config.buildSessionFactory();
+                session = sessionFactory.openSession();
+                getBoardsFromDb();
+                dbName.setText("Nombre de la base de datos: " + dbNameString);
+                // Mostrar mensaje de éxito
+                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                successAlert.setTitle("Conexión exitosa");
+                successAlert.setHeaderText("Conexión establecida correctamente");
+                successAlert.showAndWait();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                // Mostrar mensaje de error
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setTitle("Error de conexión");
+                errorAlert.setHeaderText("No se pudo conectar a la base de datos");
+                errorAlert.setContentText("Revise los credenciales de conexión y vuelva a intentarlo.");
+                errorAlert.showAndWait();
+            }
+        }
+    }
+
+    private String parseDatabaseNameFromUrl(String dbUrl) {
+        // Assuming the URL is of the format "jdbc:mysql://host:port/dbname"
+        String[] parts = dbUrl.split("/");
+        return parts.length > 3 ? parts[parts.length - 1] : "No se ha encontrado la base de datos";
     }
 
     public static void closeDb() {
@@ -385,6 +572,10 @@ public class MainController {
             session.close();
             sessionFactory.close();
         } catch (Exception e) {
+        }
+
+        if (statesThread.isAlive()) {
+            statesThread.interrupt();
         }
     }
 

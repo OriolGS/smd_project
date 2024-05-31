@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+
 
 import com.smd.controller.NotificationController;
 import com.smd.gui.MainController;
@@ -12,17 +14,17 @@ import com.smd.model.Components;
 import com.smd.model.ProgramType;
 
 import javafx.collections.FXCollections;
-import javafx.scene.control.Label;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 
 public class TxtFileReader {
     private static final String INITIAL_LINE_EXPECTED = ".PARTS";
     private static final String FINAL_LINE = ".ENDPARTS";
 
-    public static void read(File file, Label wordName, TableView<Components> componentsTable) {
+    public static void read(File file, TableView<Components> componentsTable, Button cancelButton, Button saveButton) {
         BufferedReader br = null;
         String line = "";
-        MainController.components.clear();
+        // MainController.components.clear();
 
         Board board = generateBoard(file.getName());
 
@@ -31,20 +33,34 @@ public class TxtFileReader {
             line = br.readLine();
 
             if (line.trim().equals(INITIAL_LINE_EXPECTED)) {
+                // Aquí es pot cancelar i guardar
+                
+                saveButton.setDisable(false);
+                cancelButton.setDisable(false);
+                MainController.components.clear();
+
                 while ((line = br.readLine()) != null && !line.trim().equals(FINAL_LINE)) {
                     extractComponent(line, board);
                 }
                 board.setComponents(MainController.components);
                 componentsTable.setItems(FXCollections.observableArrayList(MainController.components));
+                MainController.isModifying = false;
+                saveButton.setText("Save");
 
+                MainController.originalComponents = new ArrayList<>();
+                    for (Components component : MainController.components) {
+                        MainController.originalComponents.add(new Components(component));
+                    }
             } else {
-                NotificationController.warningMsg("Estructura de archivo inválida", "El archivo debe empezar con .PARTS");
+                NotificationController.warningMsg("Estructura de archivo inválida",
+                        "El archivo debe empezar con .PARTS");
             }
 
         } catch (IOException e) {
             NotificationController.errorMsg("Error", "No se ha podido leer bien el archivo.");
         } catch (SecurityException e) {
-            NotificationController.warningMsg("Atención!", "Problema de seguridad al acceder al archivo. No se ha podido abrir.");
+            NotificationController.warningMsg("Atención!",
+                    "Problema de seguridad al acceder al archivo. No se ha podido abrir.");
         } finally {
             if (br != null) {
                 try {

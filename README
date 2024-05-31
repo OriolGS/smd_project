@@ -28,16 +28,11 @@ Asegúrate de tener instalado lo siguiente antes de comenzar:
 
 ## Tareas a hacer:
 
-Relacionado con bbdd:
-
-- Cargar otra base de datos
-
-
 Otras funcionalidades:
 
-- Empezar a centrar siempre desde 0,0
+- Modificar que cuando una placa esté girada en la coordenada -0 torni a la 0.
 
-- Gestionar estados de los botones 
+- Mostrar nombre de la base de datos
 
 - Permitir dos archivos de csv para la misma placa
 

@@ -8,6 +8,8 @@ import com.smd.controller.NotificationController;
 import com.smd.gui.MainController;
 import com.smd.model.Components;
 
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -22,22 +24,35 @@ public class ModifyComponents {
 
     private static float cumulativePosX = 0;
     private static float cumulativePosY = 0;
-
     private static float componentPosX = 0;
     private static float componentPosY = 0;
 
-    public static void flipBoard(TableView<Components> componentsTable) {
+    @FXML
+    private Button cancelButton, saveButton;
+
+    public ModifyComponents(Button cancelButton, Button saveButton) {
+        this.cancelButton = cancelButton;
+        this.saveButton = saveButton;
+    }
+
+    public void flipBoard(TableView<Components> componentsTable) {
         // Flip the board by changing the sign of the X position of all components
         for (Components component : MainController.components) {
-            component.setPosX(-round(component.getPosX(),3));
+            component.setPosX(-round(component.getPosX(), 3));
         }
         // Refresh the components table
         componentsTable.refresh();
         // Show notification message
         NotificationController.informationMsg("Proceso Completado", "La placa ha sido girada.");
+
+        MainController.isModifying = true;
+        saveButton.setText("Modify");
+        saveButton.setDisable(false);
+        cancelButton.setDisable(false);
+
     }
 
-    public static void centerComponents(TableView<Components> componentsTable) {
+    public void centerComponents(TableView<Components> componentsTable) {
         // Create the dialog
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Información necesaria");
@@ -68,7 +83,7 @@ public class ModifyComponents {
         }
     }
 
-    private static void showDialogPositions(TableView<Components> componentsTable) {
+    private void showDialogPositions(TableView<Components> componentsTable) {
         // Dialog for selecting a position
         Dialog<ButtonType> dialogPosition = new Dialog<>();
         dialogPosition.setTitle("Información necesaria");
@@ -90,7 +105,7 @@ public class ModifyComponents {
                     component.setPosX(round(component.getPosX() - posX + cumulativePosX + componentPosX, 3));
                     component.setPosY(round(component.getPosY() - posY + cumulativePosY + componentPosY, 3));
                 }
-                //Reset the component positions
+                // Reset the component positions
                 componentPosX = 0;
                 componentPosY = 0;
                 // Update the cumulative positions
@@ -101,13 +116,19 @@ public class ModifyComponents {
                 // Show notification message
                 NotificationController.informationMsg("Proceso Completado",
                         "La placa ha sido centrada en la posición (" + posX + ", " + posY + ").");
+
+                MainController.isModifying = true;
+                saveButton.setText("Modify");
+                saveButton.setDisable(false);
+                cancelButton.setDisable(false);
+
             } catch (NumberFormatException e) {
                 NotificationController.errorMsg("Error", "Las posiciones deben ser números.");
             }
         }
     }
 
-    private static void showDialogComponents(TableView<Components> componentsTable) {
+    private void showDialogComponents(TableView<Components> componentsTable) {
         // Dialog for selecting a component
         Dialog<ButtonType> dialogComponent = new Dialog<>();
         dialogComponent.setTitle("Información necesaria");
@@ -132,10 +153,10 @@ public class ModifyComponents {
         if (response.get().equals(okButton)) {
             centerFromComponent(componentsTable, selectedComponentId);
         }
-        
+
     }
 
-    private static void centerFromComponent(TableView<Components> componentsTable, String selectedComponentId) {
+    private void centerFromComponent(TableView<Components> componentsTable, String selectedComponentId) {
         Components selectedComponent = null;
         for (Components component : MainController.components) {
             if (component.getIdentifier().equals(selectedComponentId)) {
@@ -143,7 +164,7 @@ public class ModifyComponents {
                 break;
             }
         }
-        // TODO: hay alguna posibilidad de que sea null?
+
         if (selectedComponent != null) {
             // Save the previous position of the selected component
             float oldPosX = selectedComponent.getPosX();
@@ -155,8 +176,8 @@ public class ModifyComponents {
             // component
             for (Components otherComponent : MainController.components) {
                 if (!otherComponent.getIdentifier().equals(selectedComponentId)) {
-                    otherComponent.setPosX(round(otherComponent.getPosX() - oldPosX,3));
-                    otherComponent.setPosY(round(otherComponent.getPosY() - oldPosY,3));
+                    otherComponent.setPosX(round(otherComponent.getPosX() - oldPosX, 3));
+                    otherComponent.setPosY(round(otherComponent.getPosY() - oldPosY, 3));
                 }
             }
             componentPosX += oldPosX;
@@ -166,12 +187,18 @@ public class ModifyComponents {
             // Show notification message
             NotificationController.informationMsg("Proceso Completado",
                     "El componente " + selectedComponentId + " ha sido centrado en la placa.");
+
+            MainController.isModifying = true;
+            saveButton.setText("Modify");
+            saveButton.setDisable(false);
+            cancelButton.setDisable(false);
         }
     }
 
     // Utility method to round a float to a specific number of decimal places
-    private static float round(float value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
+    private float round(float value, int places) {
+        if (places < 0)
+            throw new IllegalArgumentException();
 
         BigDecimal bd = new BigDecimal(Float.toString(value));
         bd = bd.setScale(places, RoundingMode.HALF_UP);

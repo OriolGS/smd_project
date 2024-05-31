@@ -21,7 +21,6 @@ public class Main extends Application {
         primaryStage.show();
 
         primaryStage.setOnCloseRequest(event -> {
-            // TODO: mirar si hay que controlar algo más
             MainController.closeDb();
         });
     }

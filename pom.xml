@@ -37,7 +37,7 @@
             <artifactId>javafx-base</artifactId>
             <version>13</version>
         </dependency>
-
+        
         <!-- Hibernate -->
         <dependency>
             <groupId>org.hibernate</groupId>

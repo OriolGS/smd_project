@@ -70,6 +70,17 @@ public class Components implements Serializable {
         this.flip = flip;
     }
 
+    public Components(Components component) {
+        this.identifier = component.identifier;
+        this.boardFK = component.boardFK;
+        this.type = component.type;
+        this.outline = component.outline;
+        this.posX = component.posX;
+        this.posY = component.posY;
+        this.rotation = component.rotation;
+        this.flip = component.flip;
+    }
+
     public String getIdentifier() {
         return identifier;
     }
@@ -135,7 +146,6 @@ public class Components implements Serializable {
     }
 
     public Node getNode() {
-        // TODO: modificar cómo se muestran
         VBox vbox = new VBox();
         vbox.getChildren().addAll(
                 new Label("Identifier: " + identifier),
