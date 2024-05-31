@@ -150,8 +150,8 @@ public class MainController {
             configuration = new Configuration().configure();
             sessionFactory = configuration.buildSessionFactory();
             session = sessionFactory.openSession();
-            String dbName = parseDatabaseNameFromUrl(configuration.getProperty("hibernate.connection.url"));
-            dbNameLabel.setText("Nombre de la base de datos: " + dbName);
+            String dbNameString = parseDatabaseNameFromUrl(configuration.getProperty("hibernate.connection.url"));
+            dbName.setText("Nombre de la base de datos: " + dbNameString);
         } catch (Exception e) {
         }
 
@@ -522,7 +522,7 @@ public class MainController {
             String password = result.get().getValue().getValue();
 
             // Extract the database name from the URL
-            String dbName = parseDatabaseNameFromUrl(url);
+            String dbNameString = parseDatabaseNameFromUrl(url);
 
             Configuration config = new Configuration().configure();
             config.setProperty("hibernate.connection.url", url);
@@ -533,7 +533,7 @@ public class MainController {
                 sessionFactory = config.buildSessionFactory();
                 session = sessionFactory.openSession();
                 getBoardsFromDb();
-                dbNameLabel.setText("Nombre de la base de datos: " + dbName);
+                dbName.setText("Nombre de la base de datos: " + dbNameString);
                 // Mostrar mensaje de éxito
                 Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
                 successAlert.setTitle("Conexión exitosa");
