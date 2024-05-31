@@ -9,6 +9,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -147,14 +149,63 @@ public class Components implements Serializable {
 
     public Node getNode() {
         VBox vbox = new VBox();
+        vbox.setSpacing(15);  // Espaiat entre els elements
+        vbox.setPadding(new Insets(20));  // Padding al voltant del VBox
+        vbox.setAlignment(Pos.CENTER_LEFT);  // Alineació dels elements al centre esquerra
+        vbox.setStyle(
+            "-fx-background-color: #f9f9f9; " +
+            "-fx-border-color: #b3b3b3; " +
+            "-fx-border-radius: 10px; " +
+            "-fx-background-radius: 10px; " +
+            "-fx-padding: 20px;"
+        );
+        Label identifierLabel = new Label("Identifier: " + identifier);
+        identifierLabel.setStyle(
+            "-fx-font-weight: bold; " +
+            "-fx-font-size: 16px; " +
+            "-fx-text-fill: #2a2a2a;"
+        );
+        Label typeLabel = new Label("Type: " + type);
+        typeLabel.setStyle(
+            "-fx-font-weight: bold; " +
+            "-fx-font-size: 16px; " +
+            "-fx-text-fill: #2a2a2a;"
+        );
+        Label outlineLabel = new Label("Outline: " + outline);
+        outlineLabel.setStyle(
+            "-fx-font-style: italic; " +
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #4a4a4a;"
+        );
+        Label posXLabel = new Label("Position X: " + posX);
+        posXLabel.setStyle(
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #2a2a2a;"
+        );
+        Label posYLabel = new Label("Position Y: " + posY);
+        posYLabel.setStyle(
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #2a2a2a;"
+        );
+        Label rotationLabel = new Label("Rotation: " + rotation);
+        rotationLabel.setStyle(
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #0066cc;"
+        );
+        Label flipLabel = new Label("Flip: " + flip);
+        flipLabel.setStyle(
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #cc0000;"
+        );
         vbox.getChildren().addAll(
-                new Label("Identifier: " + identifier),
-                new Label("Type: " + type),
-                new Label("Outline: " + outline),
-                new Label("Position X: " + posX),
-                new Label("Position Y: " + posY),
-                new Label("Rotation: " + rotation),
-                new Label("Flip: " + flip));
+            identifierLabel,
+            typeLabel,
+            outlineLabel,
+            posXLabel,
+            posYLabel,
+            rotationLabel,
+            flipLabel
+        );
         return vbox;
     }
 

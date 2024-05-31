@@ -1,5 +1,6 @@
 package com.smd.gui;
 
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
@@ -29,6 +30,7 @@ import com.smd.utils.TxtFileReader;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.print.PrinterJob;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -333,12 +335,42 @@ public class MainController {
     private void printTable() {
         PrinterJob printerJob = PrinterJob.createPrinterJob();
         if (printerJob != null && printerJob.showPrintDialog(primaryStage)) {
+            boolean success = true;
+
+            GridPane pageGrid = null;
+            int count = 0;
+
             for (Components component : components) {
-                printerJob.printPage(component.getNode());
+                if (count % 4 == 0) {
+                    if (pageGrid != null && !printerJob.printPage(pageGrid)) {
+                        success = false;
+                        break;
+                    }
+                    pageGrid = new GridPane();
+                    pageGrid.setPadding(new Insets(20));
+                    pageGrid.setHgap(20);
+                    pageGrid.setVgap(20);
+                }
+
+                Node node = component.getNode();
+                pageGrid.add(node, count % 2, (count / 2) % 2);
+
+                count++;
             }
-            printerJob.endJob();
-            NotificationController.informationMsg("Proceso finalizado",
-                    "El contenido de la tabla ha sido imprimido.");
+
+            // Print any remaining page with less than 4 components
+            if (pageGrid != null && !printerJob.printPage(pageGrid)) {
+                success = false;
+            }
+
+            if (success) {
+                printerJob.endJob();
+                NotificationController.informationMsg("Proceso finalizado",
+                        "El contenido de la tabla ha sido imprimido.");
+            } else {
+                NotificationController.informationMsg("Error",
+                        "La impresión falló.");
+            }
         }
     }
 

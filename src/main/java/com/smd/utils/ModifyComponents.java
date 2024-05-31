@@ -38,7 +38,11 @@ public class ModifyComponents {
     public void flipBoard(TableView<Components> componentsTable) {
         // Flip the board by changing the sign of the X position of all components
         for (Components component : MainController.components) {
-            component.setPosX(-round(component.getPosX(), 3));
+            if(component.getPosX() == 0.0f){
+                component.setPosX(0.0f);
+            }else{
+                component.setPosX(-round(component.getPosX(), 3));
+            }
         }
         // Refresh the components table
         componentsTable.refresh();
@@ -49,7 +53,6 @@ public class ModifyComponents {
         saveButton.setText("Modify");
         saveButton.setDisable(false);
         cancelButton.setDisable(false);
-
     }
 
     public void centerComponents(TableView<Components> componentsTable) {
