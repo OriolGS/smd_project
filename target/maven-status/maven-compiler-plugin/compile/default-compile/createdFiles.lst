@@ -1,3 +1,4 @@
+com\smd\utils\Help.class
 com\smd\model\ProgramType.class
 com\smd\utils\CsvWriter.class
 com\smd\gui\Main.class

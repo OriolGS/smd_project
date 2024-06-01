@@ -25,6 +25,7 @@ import com.smd.utils.AsqWriter;
 import com.smd.utils.ModifyComponents;
 import com.smd.utils.CsvFileReader;
 import com.smd.utils.CsvWriter;
+import com.smd.utils.Help;
 import com.smd.utils.TxtFileReader;
 
 import javafx.collections.FXCollections;
@@ -584,6 +585,18 @@ public class MainController {
         // Assuming the URL is of the format "jdbc:mysql://host:port/dbname"
         String[] parts = dbUrl.split("/");
         return parts.length > 3 ? parts[parts.length - 1] : "No se ha encontrado la base de datos";
+    }
+
+    public void helpManual() {
+        Help.helpManual();
+    }
+
+    public void helpTutorials() {
+        Help.helpTutorials();
+    }
+
+    public void helpAbout() {
+        Help.helpAbout();
     }
 
     public static void closeDb() {
