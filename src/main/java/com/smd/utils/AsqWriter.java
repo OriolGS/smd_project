@@ -14,22 +14,37 @@ public class AsqWriter {
     private static final String SEPARATOR = ",";
     private static final String CHUCK = HASH + "PXY" + HASH + SEPARATOR;
 
-    private static String asqText = "";
+    private static String asqText1 = "";
+    private static String asqText2 = "";
 
     public static void generate(ArrayList<Components> components, String path) {
         for (Components c : components) {
-            asqText += HASH + c.getIdentifier() + HASH + SEPARATOR + c.getPosX() + SEPARATOR + " " + c.getPosY()
-                    + " "
-                    + c.getRotation() + SEPARATOR + CHUCK + HASH + HASH + SEPARATOR + HASH + c.getType() + " "
-                    + c.getOutline() + " " + HASH + "1,T,#1#,0,F,#TAPE#,#X#,#" + c.isFlip() + "#,##,##,F";
+            if (!c.isFlip()) {
+                asqText1 += HASH + c.getIdentifier() + HASH + SEPARATOR + c.getPosX() + SEPARATOR + " " + c.getPosY()
+                        + " "
+                        + c.getRotation() + SEPARATOR + CHUCK + HASH + HASH + SEPARATOR + HASH + c.getType() + " "
+                        + c.getOutline() + " " + HASH + "1,T,#1#,0,F,#TAPE#,#X#,#" + c.isFlip() + "#,##,##,F";
 
-            asqText += "\n";
+                asqText1 += "\n";
+            } else {
+                asqText2 += HASH + c.getIdentifier() + HASH + SEPARATOR + c.getPosX() + SEPARATOR + " " + c.getPosY()
+                        + " "
+                        + c.getRotation() + SEPARATOR + CHUCK + HASH + HASH + SEPARATOR + HASH + c.getType() + " "
+                        + c.getOutline() + " " + HASH + "1,T,#1#,0,F,#TAPE#,#X#,#" + c.isFlip() + "#,##,##,F";
+
+                asqText2 += "\n";
+            }
         }
 
+        writeAsqFile(path, asqText1, false);
+        writeAsqFile(path, asqText2, true);
+    }
+
+    private static void writeAsqFile(String path, String text, boolean fliped) {
         FileWriter fw = null;
         try {
-            fw = new FileWriter(path + ".asq");
-            fw.write(asqText);
+            fw = fliped ? new FileWriter(path + "fliped.asq") : new FileWriter(path + ".asq");
+            fw.write(text);
             fw.close();
 
             Alert alert = new Alert(AlertType.CONFIRMATION);

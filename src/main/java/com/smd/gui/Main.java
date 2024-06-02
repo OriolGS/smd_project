@@ -21,6 +21,7 @@ public class Main extends Application {
         primaryStage.show();
 
         primaryStage.setOnCloseRequest(event -> {
+            MainController.closeEmptyTableThread();
             MainController.closeDb();
         });
     }

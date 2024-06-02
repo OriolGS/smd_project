@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-
 import com.smd.controller.NotificationController;
 import com.smd.gui.MainController;
 import com.smd.model.Board;
@@ -33,8 +32,10 @@ public class TxtFileReader {
 
             if (line.trim().equals(INITIAL_LINE_EXPECTED)) {
                 // Aquí es pot cancelar i guardar
-                
-                saveButton.setDisable(false);
+
+                if (MainController.dbConnected) {
+                    saveButton.setDisable(false);
+                }
                 cancelButton.setDisable(false);
                 MainController.components.clear();
 
@@ -47,9 +48,9 @@ public class TxtFileReader {
                 saveButton.setText("Save");
 
                 MainController.originalComponents = new ArrayList<>();
-                    for (Components component : MainController.components) {
-                        MainController.originalComponents.add(new Components(component));
-                    }
+                for (Components component : MainController.components) {
+                    MainController.originalComponents.add(new Components(component));
+                }
             } else {
                 NotificationController.warningMsg("Estructura de archivo inválida",
                         "El archivo debe empezar con .PARTS");
@@ -104,6 +105,7 @@ public class TxtFileReader {
 
         board.setBoardName(boardName);
         board.setProgram(ProgramType.Seetrax);
+        board.setFilesLeft(false);
         return board;
     }
 }

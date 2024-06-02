@@ -78,7 +78,7 @@ public class Help {
         Label fileLabel1 = new Label("Open...");
         fileLabel1.setStyle(estiloLabel2);
 
-        Text fileText1 = new Text("Permite abrir un fichero generado por uno de los programas y cargarlo en la tabla.");
+        Text fileText1 = new Text("Permite abrir un fichero TXT (de Seetrax) y hasta dos CSV (de KiCad) y cargarlos en la tabla.");
         fileText1.setStyle(estiloText);
 
         TextFlow fileTextFlow = new TextFlow(fileText1);
@@ -89,8 +89,8 @@ public class Help {
         Text fileText2 = new Text("Muestra 3 opciones: Set directory, to asq y to csv.\n");
         Text fileText3 = new Text(
                 "• Set directory: Permite indicar que carpeta nos saldrá por defecto cuando exportemos datos.\n");
-        Text fileText4 = new Text("• To asq: Exporta los datos de la tabla a un fichero con extensión .asq.\n");
-        Text fileText5 = new Text("• To csv: Exporta los datos de la tabla a un fichero con extensión .csv.");
+        Text fileText4 = new Text("• To asq: Exporta los datos de la tabla a dos ficheros con extensión .asq.\n");
+        Text fileText5 = new Text("• To csv: Exporta los datos de la tabla a dos ficheros con extensión .csv.");
         fileText2.setStyle(estiloText);
         fileText3.setStyle(estiloText);
         fileText4.setStyle(estiloText);

@@ -31,13 +31,17 @@ public class Board {
     @OneToMany(mappedBy = "boardFK", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Components> components;
 
+    @Column(name = "FilesLeft")
+    private boolean filesLeft;
+
     public Board() {
     }
 
-    public Board(String name, ProgramType programType, ArrayList<Components> components) {
+    public Board(String name, ProgramType programType, ArrayList<Components> components, boolean filesLeft) {
         this.name = name;
         this.programType = programType;
         this.components = components;
+        this.filesLeft = filesLeft;
     }
 
     public Integer getId() {
@@ -70,6 +74,17 @@ public class Board {
 
     public void setComponents(ArrayList<Components> components) {
         this.components = components;
+    }
+    public void addComponent(Components components) {
+        this.components.add(components);
+    }
+
+    public boolean isFilesLeft() {
+        return filesLeft;
+    }
+
+    public void setFilesLeft(boolean filesLeft) {
+        this.filesLeft = filesLeft;
     }
 
     @Override

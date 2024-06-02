@@ -51,7 +51,9 @@ public class ModifyComponents {
 
         MainController.isModifying = true;
         saveButton.setText("Modify");
-        saveButton.setDisable(false);
+        if (MainController.dbConnected) {
+            saveButton.setDisable(false);
+        }
         cancelButton.setDisable(false);
     }
 
@@ -122,7 +124,9 @@ public class ModifyComponents {
 
                 MainController.isModifying = true;
                 saveButton.setText("Modify");
-                saveButton.setDisable(false);
+                if (MainController.dbConnected) {
+                    saveButton.setDisable(false);
+                }
                 cancelButton.setDisable(false);
 
             } catch (NumberFormatException e) {
@@ -193,7 +197,9 @@ public class ModifyComponents {
 
             MainController.isModifying = true;
             saveButton.setText("Modify");
-            saveButton.setDisable(false);
+            if (MainController.dbConnected) {
+                saveButton.setDisable(false);
+            }
             cancelButton.setDisable(false);
         }
     }

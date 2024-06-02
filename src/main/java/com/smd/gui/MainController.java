@@ -3,6 +3,7 @@ package com.smd.gui;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.util.Pair;
 
 import java.io.File;
@@ -17,10 +18,12 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+
 import com.smd.controller.EmptyTableController;
 import com.smd.controller.NotificationController;
 import com.smd.model.Board;
 import com.smd.model.Components;
+import com.smd.model.ProgramType;
 import com.smd.utils.AsqWriter;
 import com.smd.utils.ModifyComponents;
 import com.smd.utils.CsvFileReader;
@@ -59,7 +62,7 @@ public class MainController {
 
     private static File selectedFolder;
 
-    public static boolean isModifying = false;
+    public static boolean isModifying = false, dbConnected;
 
     private ModifyComponents modifyComponents;
 
@@ -120,7 +123,9 @@ public class MainController {
         try {
             startDb();
             getBoardsFromDb();
+            dbConnected = true;
         } catch (Exception e) {
+            dbConnected = false;
             dbName.setText("No se pudo conectar a la base de datos.");
             reloadDb.setDisable(true);
             comboBoxBoards.setDisable(true);
@@ -140,13 +145,42 @@ public class MainController {
 
     private void onCellEdit(TableColumn.CellEditEvent<Components, ?> event) {
         // Enable the save button when a cell is edited
+        Components component = event.getRowValue(); // Obten el componente modificado
+        String columnName = event.getTableColumn().getText();
+        Object newValue = event.getNewValue();
+
+        switch (columnName) {
+            case "Identifier":
+                component.setIdentifier((String) newValue);
+                break;
+            case "Type":
+                component.setType((String) newValue);
+                break;
+            case "Outline":
+                component.setOutline((String) newValue);
+                break;
+            case "PosX":
+                component.setPosX((Float) newValue);
+                break;
+            case "PosY":
+                component.setPosY((Float) newValue);
+                break;
+            case "Rotation":
+                component.setRotation((Float) newValue);
+                break;
+            case "Flip":
+                component.setFlip((Boolean) newValue);
+                break;
+        }
+
         isModifying = true;
         saveButton.setText("Modify");
-        saveButton.setDisable(false);
+        if (dbConnected) {
+            saveButton.setDisable(false);
+        }
         cancelButton.setDisable(false);
     }
 
-    // TODO: plantearme si hacer una clase para controlar conexiones con bbdd
     private void startDb() throws Exception {
         configuration = new Configuration().configure();
         sessionFactory = configuration.buildSessionFactory();
@@ -252,14 +286,41 @@ public class MainController {
 
         fileChooser.setInitialDirectory(selectedFolder);
 
-        File file = fileChooser.showOpenDialog(primaryStage);
+        List<File> files = fileChooser.showOpenMultipleDialog(primaryStage);
 
-        if (file == null || !file.exists()) {
-        } else if (file.length() == 0) {
-            NotificationController.warningMsg("Problema con archivo", "El archivo seleccionado está vacío.");
+        if (files == null || files.isEmpty()) {
+            // No ha seleccionado nada
+        } else if (files.size() > 2) {
+            NotificationController.warningMsg("Selección de archivos",
+                    "Por favor, seleccione un máximo de dos archivos.");
+        } else if (files.size() == 2) {
+            checkFilesList(files);
         } else {
-            openFile(file);
+            openFile(files.get(0));
         }
+    }
+
+    private void checkFilesList(List<File> files) {
+        ArrayList<File> filesCopy = new ArrayList<File>();
+        for (File file : files) {
+            if (!file.exists()) {
+                NotificationController.warningMsg("Problema con archivo",
+                        "El archivo seleccionado no existe: " + file.getName());
+
+            } else if (file.length() == 0) {
+                NotificationController.warningMsg("Problema con archivo",
+                        "El archivo seleccionado está vacío: " + file.getName());
+            } else {
+                filesCopy.add(file);
+            }
+        }
+
+        if (filesCopy.size() == 2) {
+            openFiles(filesCopy);
+        } else {
+            openFile(filesCopy.get(0));
+        }
+
     }
 
     private void openFile(File file) {
@@ -272,12 +333,116 @@ public class MainController {
                 break;
 
             case ".csv":
-                CsvFileReader.read(file, componentsTable, cancelButton, saveButton);
+                ArrayList<Board> kiCadBoards = getKiCadBoards();
+
+                if (kiCadBoards != null && kiCadBoards.size() > 0) {
+                    // preguntar si es de una placa introducida
+                    Dialog<ButtonType> dialog = new Dialog<>();
+                    dialog.setTitle("Selecciona una opción:");
+                    dialog.setHeaderText("¿Nueva placa o placa almacenada?");
+                    // Create the radio buttons and toggle group
+                    RadioButton newBoard = new RadioButton("El archivo es de una placa nueva");
+                    RadioButton boardInDB = new RadioButton("El archivo es de una placa de la base de datos");
+                    ToggleGroup group = new ToggleGroup();
+                    newBoard.setToggleGroup(group);
+                    boardInDB.setToggleGroup(group);
+                    newBoard.setSelected(true);
+
+                    // Add radio buttons to a VBox
+                    VBox vbox = new VBox(newBoard, boardInDB);
+
+                    dialog.getDialogPane().setContent(vbox);
+                    // Add OK and Cancel buttons to the dialog
+                    ButtonType okButton = new ButtonType("OK", ButtonData.OK_DONE);
+                    dialog.getDialogPane().getButtonTypes().addAll(okButton, ButtonType.CANCEL);
+
+                    Optional<ButtonType> response = dialog.showAndWait();
+
+                    if (response.get().equals(okButton) && newBoard.isSelected()) {
+                        NotificationController.informationMsg("Nueva placa", "Quieres introducir una nueva placa");
+                        CsvFileReader.read(file, null, componentsTable, cancelButton, saveButton);
+                    } else if (response.get().equals(okButton) && boardInDB.isSelected()) {
+
+                        selectBoardFromDb(file, kiCadBoards);
+
+                    }
+
+                } else {
+                    NotificationController.informationMsg("No hay placas KiCad", "Que pena!");
+                    CsvFileReader.read(file, null, componentsTable, cancelButton, saveButton);
+                }
+
                 break;
 
             default:
+                NotificationController.errorMsg("Error con archivo",
+                        "Lo sentimos. Solo puedes abrir archivos .txt o .csv");
                 break;
         }
+    }
+
+    private void selectBoardFromDb(File file, ArrayList<Board> kiCadBoards) {
+        // si es que sí, mostrar solo las de csv para seleccionar
+        Dialog<ButtonType> dialogComponent = new Dialog<>();
+        dialogComponent.setTitle("Información necesaria");
+        dialogComponent.setHeaderText("Selecciona la placa a la que pertenece:");
+        // Create the combo box
+        ComboBox<String> comboBoxBoards = new ComboBox<>();
+        for (Board board : kiCadBoards) {
+            comboBoxBoards.getItems().add(board.getBoardName());
+        }
+
+        comboBoxBoards.getSelectionModel().selectFirst();
+        // Add the combo box to the dialog
+        dialogComponent.getDialogPane().setContent(comboBoxBoards);
+        // Add OK and Cancel buttons to the dialog
+        ButtonType okButton2 = new ButtonType("OK", ButtonData.OK_DONE);
+        dialogComponent.getDialogPane().getButtonTypes().addAll(okButton2, ButtonType.CANCEL);
+
+        Optional<ButtonType> response2 = dialogComponent.showAndWait();
+
+        if (response2.get().equals(okButton2)) {
+            NotificationController.informationMsg("Has seleccionado una placa!",
+                    "La placa seleccionada es: "
+                            + kiCadBoards.get(comboBoxBoards.getSelectionModel().getSelectedIndex())
+                                    .getBoardName());
+
+            CsvFileReader.read(file,
+                    kiCadBoards.get(comboBoxBoards.getSelectionModel().getSelectedIndex()),
+                    componentsTable, cancelButton, saveButton);
+        }
+    }
+
+    private void openFiles(List<File> files) {
+        int extensionIndex = files.get(0).getName().lastIndexOf('.');
+        String fileExtension = files.get(0).getName().substring(extensionIndex);
+
+        switch (fileExtension) {
+            case ".txt":
+                NotificationController.warningMsg("Sólo un .txt permitido a la vez",
+                        "Hemos cargado el primero.");
+                TxtFileReader.read(files.get(0), componentsTable, cancelButton, saveButton);
+                break;
+
+            case ".csv":
+                CsvFileReader.read(files, componentsTable, cancelButton, saveButton);
+                break;
+
+            default:
+                NotificationController.errorMsg("Error con archivo",
+                        "Lo sentimos. Solo puedes abrir archivos .txt o .csv");
+                break;
+        }
+    }
+
+    private ArrayList<Board> getKiCadBoards() {
+        ArrayList<Board> kiCadBoards = new ArrayList<>();
+        for (Board board : boards) {
+            if (board.getProgram().equals(ProgramType.KiCad) && board.isFilesLeft()) {
+                kiCadBoards.add(board);
+            }
+        }
+        return kiCadBoards;
     }
 
     @FXML
@@ -568,6 +733,7 @@ public class MainController {
                 reloadDb.setDisable(false);
                 comboBoxBoards.setDisable(false);
                 loadBoard.setDisable(false);
+                dbConnected = true;
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -605,7 +771,9 @@ public class MainController {
             sessionFactory.close();
         } catch (Exception e) {
         }
+    }
 
+    public static void closeEmptyTableThread() {
         if (statesThread.isAlive()) {
             statesThread.interrupt();
         }
