@@ -92,6 +92,7 @@ public class MainController {
 
     @FXML
     public void initialize() {
+        // Inicializa las columnas de la tabla
         identifier.setCellValueFactory(new PropertyValueFactory<>("identifier"));
         type.setCellValueFactory(new PropertyValueFactory<>("type"));
         outline.setCellValueFactory(new PropertyValueFactory<>("outline"));
@@ -100,7 +101,7 @@ public class MainController {
         rotation.setCellValueFactory(new PropertyValueFactory<>("rotation"));
         flip.setCellValueFactory(new PropertyValueFactory<>("flip"));
 
-        // Hace las columnas editables
+        // Hace las columnas editables y crea sus EventListeners
         identifier.setCellFactory(TextFieldTableCell.forTableColumn());
         identifier.setOnEditCommit(event -> onCellEdit(event));
         type.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -116,10 +117,12 @@ public class MainController {
         flip.setCellFactory(TextFieldTableCell.forTableColumn(new BooleanStringConverter()));
         flip.setOnEditCommit(event -> onCellEdit(event));
 
+        // Crea el directorio predeterminado
         String userHome = System.getProperty("user.home");
         String downloadsFolder = userHome + File.separator + "Downloads";
         selectedFolder = new File(downloadsFolder);
 
+        // Intenta establecer conexión con la base de datos
         try {
             startDb();
             getBoardsFromDb();
@@ -132,20 +135,26 @@ public class MainController {
             loadBoard.setDisable(true);
         }
 
+        // Desactica los botones de guardar y cancelar
         saveButton.setDisable(true);
         cancelButton.setDisable(true);
+
         modifyComponents = new ModifyComponents(cancelButton, saveButton);
 
+        // Inicializa el thread que comprueba si la tabla está vacía o no
         stateController = new EmptyTableController(componentsTable, exportToAsq, exportToCsv,
                 printBoard, centerComponent, flipBoard);
         statesThread = new Thread(stateController);
-
         statesThread.start();
     }
 
+    /**
+     * Recibe el @param event de la tabla para hacer la persitencia de modificación
+     * del componente y activa los botones de cancelar y guardar (en este caso
+     * modificar)
+     */
     private void onCellEdit(TableColumn.CellEditEvent<Components, ?> event) {
-        // Enable the save button when a cell is edited
-        Components component = event.getRowValue(); // Obten el componente modificado
+        Components component = event.getRowValue();
         String columnName = event.getTableColumn().getText();
         Object newValue = event.getNewValue();
 
@@ -189,6 +198,10 @@ public class MainController {
         dbName.setText("Nombre de la base de datos: " + dbNameString);
     }
 
+    /**
+     * Rellena el comboBoxBoards con las placas que hay almacenadas en la base de
+     * datos
+     */
     private void getBoardsFromDb() {
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<Board> criteriaQuery = builder.createQuery(Board.class);
@@ -204,7 +217,7 @@ public class MainController {
                 comboBoxBoards.getItems().add(board.getBoardName());
             }
         } else {
-            dbName.setText("No se ha encontrado la base de datos");
+            dbName.setText("No se han encontrado placas en la base de datos");
         }
     }
 
@@ -230,6 +243,10 @@ public class MainController {
         }
     }
 
+    /**
+     * Carga los componentes que hay en la base de datos de la placa que hay
+     * seleccionada en el comboBoxBoards
+     */
     @FXML
     private void loadInfoFromDb() {
         try {
@@ -276,6 +293,12 @@ public class MainController {
         }
     }
 
+    /**
+     * Abre un fileChooser con los filtros csv y txt para que sólo pueda abrir
+     * archivos con estas extensiones.
+     * Si el usuario ha seleccionado dos archivos, lo manda a checkFilesList, si
+     * solo selecciona uno, lo manda al método que lo abre.
+     */
     @FXML
     private void handleOpenFile() {
         FileChooser fileChooser = new FileChooser();
@@ -300,6 +323,14 @@ public class MainController {
         }
     }
 
+    /**
+     * Recibe una lista con los archivos seleccionados por el usuario y comprueba
+     * que ambos se puedan abrir y que no estén vacíos.
+     * Si ambos están bien, los manda al método que los abre; si alguno no pasa las
+     * comprobaciones, no lo manda.
+     * 
+     * @param files
+     */
     private void checkFilesList(List<File> files) {
         ArrayList<File> filesCopy = new ArrayList<File>();
         for (File file : files) {
@@ -317,7 +348,7 @@ public class MainController {
 
         if (filesCopy.size() == 2) {
             openFiles(filesCopy);
-        } else {
+        } else if (filesCopy.size() == 1) {
             openFile(filesCopy.get(0));
         }
 
@@ -327,20 +358,24 @@ public class MainController {
         int extensionIndex = file.getName().lastIndexOf('.');
         String fileExtension = file.getName().substring(extensionIndex);
 
+        // Comprueba qué extensión tiene el archivo recibido
         switch (fileExtension) {
             case ".txt":
+                // Trata el archivo como uno de Seetrax
                 TxtFileReader.read(file, componentsTable, cancelButton, saveButton);
                 break;
 
             case ".csv":
+                // Recibe todas las placas de la base de datos hechas con KiCad y que no se
+                // hayan introducido dos csv's
                 ArrayList<Board> kiCadBoards = getKiCadBoards();
 
+                // Si hay alguna, pregunta si el csv tiene relación con alguna de ellas
                 if (kiCadBoards != null && kiCadBoards.size() > 0) {
-                    // preguntar si es de una placa introducida
                     Dialog<ButtonType> dialog = new Dialog<>();
                     dialog.setTitle("Selecciona una opción:");
                     dialog.setHeaderText("¿Nueva placa o placa almacenada?");
-                    // Create the radio buttons and toggle group
+
                     RadioButton newBoard = new RadioButton("El archivo es de una placa nueva");
                     RadioButton boardInDB = new RadioButton("El archivo es de una placa de la base de datos");
                     ToggleGroup group = new ToggleGroup();
@@ -348,30 +383,26 @@ public class MainController {
                     boardInDB.setToggleGroup(group);
                     newBoard.setSelected(true);
 
-                    // Add radio buttons to a VBox
                     VBox vbox = new VBox(newBoard, boardInDB);
-
                     dialog.getDialogPane().setContent(vbox);
-                    // Add OK and Cancel buttons to the dialog
+
                     ButtonType okButton = new ButtonType("OK", ButtonData.OK_DONE);
                     dialog.getDialogPane().getButtonTypes().addAll(okButton, ButtonType.CANCEL);
 
                     Optional<ButtonType> response = dialog.showAndWait();
 
                     if (response.get().equals(okButton) && newBoard.isSelected()) {
-                        NotificationController.informationMsg("Nueva placa", "Quieres introducir una nueva placa");
                         CsvFileReader.read(file, null, componentsTable, cancelButton, saveButton);
                     } else if (response.get().equals(okButton) && boardInDB.isSelected()) {
-
+                        // Si el usuario quiere unir el archivo a una de las placas existentes, se llama
+                        // a selecteBoardFromDb para que seleccione la placa a unir
                         selectBoardFromDb(file, kiCadBoards);
-
                     }
 
                 } else {
                     NotificationController.informationMsg("No hay placas KiCad", "Que pena!");
                     CsvFileReader.read(file, null, componentsTable, cancelButton, saveButton);
                 }
-
                 break;
 
             default:
@@ -381,38 +412,44 @@ public class MainController {
         }
     }
 
+    /**
+     * Muestra diálogo para que seleccione la placa que con la que quiere unir el
+     * csv a abrir
+     * 
+     * @param file
+     * @param kiCadBoards
+     */
     private void selectBoardFromDb(File file, ArrayList<Board> kiCadBoards) {
-        // si es que sí, mostrar solo las de csv para seleccionar
         Dialog<ButtonType> dialogComponent = new Dialog<>();
         dialogComponent.setTitle("Información necesaria");
         dialogComponent.setHeaderText("Selecciona la placa a la que pertenece:");
-        // Create the combo box
+
         ComboBox<String> comboBoxBoards = new ComboBox<>();
         for (Board board : kiCadBoards) {
             comboBoxBoards.getItems().add(board.getBoardName());
         }
-
         comboBoxBoards.getSelectionModel().selectFirst();
-        // Add the combo box to the dialog
         dialogComponent.getDialogPane().setContent(comboBoxBoards);
-        // Add OK and Cancel buttons to the dialog
+
         ButtonType okButton2 = new ButtonType("OK", ButtonData.OK_DONE);
         dialogComponent.getDialogPane().getButtonTypes().addAll(okButton2, ButtonType.CANCEL);
 
         Optional<ButtonType> response2 = dialogComponent.showAndWait();
 
         if (response2.get().equals(okButton2)) {
-            NotificationController.informationMsg("Has seleccionado una placa!",
-                    "La placa seleccionada es: "
-                            + kiCadBoards.get(comboBoxBoards.getSelectionModel().getSelectedIndex())
-                                    .getBoardName());
-
             CsvFileReader.read(file,
                     kiCadBoards.get(comboBoxBoards.getSelectionModel().getSelectedIndex()),
                     componentsTable, cancelButton, saveButton);
         }
     }
 
+    /**
+     * Recibe una lista de archivos. Si la extensión es .txt avisa que sólo se debe
+     * poder abrir uno y abre el primero de la lista.
+     * Si los archivos son csv, manda a abrir los dos.
+     * 
+     * @param files
+     */
     private void openFiles(List<File> files) {
         int extensionIndex = files.get(0).getName().lastIndexOf('.');
         String fileExtension = files.get(0).getName().substring(extensionIndex);
@@ -435,6 +472,14 @@ public class MainController {
         }
     }
 
+    /**
+     * Selecciona todas las placas que hay en la base de datos que sean del programa
+     * KiCad y que sólo se hayan introducido un archivo csv.
+     * Al tener ya una lista actualizada de todas las placas de la base de datos, se
+     * recorre esta, ahorrando tiempo y consultas a la base de datos
+     * 
+     * @return ArrayList con las placas que cumplen ambas condiciones
+     */
     private ArrayList<Board> getKiCadBoards() {
         ArrayList<Board> kiCadBoards = new ArrayList<>();
         for (Board board : boards) {
@@ -471,6 +516,13 @@ public class MainController {
         }
     }
 
+    /**
+     * Abre un diálogo para introducir el nombre con el que se quiere exportar los
+     * archivos. Si el usuario deja el campo en blanco, no se le permite darle al
+     * botón de continuar.
+     * 
+     * @return
+     */
     private String getFileName() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Información necesaria");
@@ -540,6 +592,10 @@ public class MainController {
         }
     }
 
+    /**
+     * Al apretar el botón de guardar, se abre un diálogo para introducir un nombre
+     * para la placa si esta no está almacenada
+     */
     @FXML
     private void askBoardName() {
         Board board = components.get(0).getBoardFK();
@@ -578,6 +634,12 @@ public class MainController {
         }
     }
 
+    /**
+     * Almacena o modifica la placa recibida junto a todos sus componentes. Una vez
+     * termina, recarga el comboBox con las placas que hay en la base de datos.
+     * 
+     * @param board
+     */
     private void saveToDb(Board board) {
         Transaction transaction = null;
 
@@ -618,6 +680,40 @@ public class MainController {
         getBoardsFromDb();
     }
 
+    /**
+     * Al apretar el botón de cancelar, abre un diálogo para que el usuario
+     * confirme. Si lo hace pueden pasar dos cosas:
+     * 1. Que desahaga los cambios de la tabla si es que había hecho algunos
+     * 2. Si el usuario no había hecho cambios, lo que hace es vaciar la tabla
+     */
+    @FXML
+    public void askForCancel() {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Información necesaria");
+        dialog.setHeaderText("¿Estás seguro de que quieres cancelar?");
+
+        ButtonType okButtonType = new ButtonType("OK", ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
+
+        dialog.showAndWait().ifPresent(response -> {
+            if (response == okButtonType) {
+                if (isModifying) {
+                    componentsTable.getItems().clear();
+                    components = new ArrayList<>(originalComponents);
+                    componentsTable.setItems(FXCollections.<Components>observableArrayList(components));
+
+                } else {
+                    components.clear();
+                    componentsTable.getItems().clear();
+                }
+
+                NotificationController.informationMsg("Proceso Cancelado", "El proceso ha sido cancelado.");
+                saveButton.setDisable(true);
+                cancelButton.setDisable(true);
+            }
+        });
+    }
+
     @FXML
     private void centerOn() {
         originalComponents = new ArrayList<>();
@@ -635,36 +731,6 @@ public class MainController {
             originalComponents.add(new Components(component));
         }
         modifyComponents.flipBoard(componentsTable);
-    }
-
-    public void askForCancel() {
-        // Create the dialog
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Información necesaria");
-        dialog.setHeaderText("¿Estás seguro de que quieres cancelar?");
-        // Add OK and Cancel buttons to the dialog
-        ButtonType okButtonType = new ButtonType("OK", ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
-        // Show the dialog and wait for a response
-        dialog.showAndWait().ifPresent(response -> {
-            if (response == okButtonType) {
-                if (isModifying) {
-                    componentsTable.getItems().clear();
-                    components = new ArrayList<>(originalComponents);
-                    componentsTable.setItems(FXCollections.<Components>observableArrayList(components));
-
-                } else {
-                    // empty table
-                    components.clear();
-                    componentsTable.getItems().clear();
-                }
-
-                // Show notification message
-                NotificationController.informationMsg("Proceso Cancelado", "El proceso ha sido cancelado.");
-                saveButton.setDisable(true);
-                cancelButton.setDisable(true);
-            }
-        });
     }
 
     public void dbConfig() {

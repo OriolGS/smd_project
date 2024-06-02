@@ -16,6 +16,13 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 
+/**
+ * Recibe el archivo a abrir la tabla donde mostrar sus componentes y los
+ * botones para
+ * cancelar y guardar.
+ * Comprueba que el archivo sea válido y que contengan componentes dentro, si lo
+ * es, los componentes y prepara los botones para guardar y cancelar
+ */
 public class TxtFileReader {
     private static final String INITIAL_LINE_EXPECTED = ".PARTS";
     private static final String FINAL_LINE = ".ENDPARTS";
@@ -71,6 +78,12 @@ public class TxtFileReader {
         }
     }
 
+    /**
+     * Extrae los componentes del archivo y los almacena en la placa
+     * 
+     * @param line
+     * @param board
+     */
     private static void extractComponent(String line, Board board) {
         String[] component = new String[7];
         Components c;
@@ -97,6 +110,12 @@ public class TxtFileReader {
         MainController.components.add(c);
     }
 
+    /**
+     * Crea la placa para poder almacenar los componentes en su lista
+     * 
+     * @param fileName
+     * @return
+     */
     private static Board generateBoard(String fileName) {
         Board board = new Board();
 

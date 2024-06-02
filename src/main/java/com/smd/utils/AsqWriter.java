@@ -17,6 +17,13 @@ public class AsqWriter {
     private static String asqText1 = "";
     private static String asqText2 = "";
 
+    /**
+     * Recibe los componentes a exportar y crea un String para los que están en la
+     * cara A y otro para los de la cara B.
+     * 
+     * @param components
+     * @param path
+     */
     public static void generate(ArrayList<Components> components, String path) {
         for (Components c : components) {
             if (!c.isFlip()) {
@@ -40,17 +47,24 @@ public class AsqWriter {
         writeAsqFile(path, asqText2, true);
     }
 
+    /**
+     * Crea dos archivos .asq, uno para cada cara, añadiendo "_fliped" al archivo de la B para diferenciarlos. 
+     * @param path
+     * @param text
+     * @param fliped
+     */
     private static void writeAsqFile(String path, String text, boolean fliped) {
         FileWriter fw = null;
         try {
-            fw = fliped ? new FileWriter(path + "fliped.asq") : new FileWriter(path + ".asq");
+            String extensioString = fliped ? "_fliped.asq" : ".asq";
+            fw = new FileWriter(path + extensioString);
             fw.write(text);
             fw.close();
 
             Alert alert = new Alert(AlertType.CONFIRMATION);
             alert.setTitle("Archivo creado correctamente");
             alert.setHeaderText("El archivo se ha creado en:");
-            alert.setContentText(path + ".asq");
+            alert.setContentText(path + extensioString);
             alert.getButtonTypes().remove(1);
             alert.show();
         } catch (IOException e) {

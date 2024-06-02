@@ -15,6 +15,13 @@ public class CsvWriter {
     private static String csvText1;
     private static String csvText2;
 
+    /**
+     * Recibe los componentes a exportar y crea un String para los que están en la
+     * cara A y otro para los de la cara B.
+     * 
+     * @param components
+     * @param path
+     */
     public static void generate(ArrayList<Components> components, String path) {
         csvText1 = COLUMNS_HEADER;
         csvText1 += "\n";
@@ -39,17 +46,26 @@ public class CsvWriter {
 
     }
 
+    /**
+     * Crea dos archivos .asq, uno para cada cara, añadiendo "_fliped" al archivo de
+     * la B para diferenciarlos.
+     * 
+     * @param path
+     * @param text
+     * @param fliped
+     */
     private static void writeCsvFile(String path, String text, boolean fliped) {
         FileWriter fw = null;
         try {
-            fw = fliped ? new FileWriter(path + "fliped.csv") : new FileWriter(path + ".csv");
+            String extensioString = fliped ? "_fliped.csv" : ".csv";
+            fw = new FileWriter(path + extensioString);
             fw.write(text);
             fw.close();
 
             Alert alert = new Alert(AlertType.CONFIRMATION);
             alert.setTitle("Archivo creado correctamente");
             alert.setHeaderText("El archivo se ha creado en:");
-            alert.setContentText(path + ".csv");
+            alert.setContentText(path + extensioString);
             alert.getButtonTypes().remove(1);
             alert.show();
         } catch (IOException e) {

@@ -20,6 +20,7 @@ public class Main extends Application {
 
         primaryStage.show();
 
+        // Antes de cerrar cierra las conexiones y e los threads
         primaryStage.setOnCloseRequest(event -> {
             MainController.closeEmptyTableThread();
             MainController.closeDb();

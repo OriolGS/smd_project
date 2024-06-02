@@ -195,7 +195,7 @@ public class Help {
         infoLabel1.setStyle(estiloLabel2);
 
         Text infoText1 = new Text(
-                "Versión: 4.0.0\nCommit: a6a5f577a45642305007e75a3ebb0f2aa6e25f7a\nAutor: SMD (Marc Freixanet y Oriol Gracia)\nFecha: 2024-06-01\nLicencia: MIT");
+                "Versión: 4.0.0\nAutor: SMD (Marc Freixanet y Oriol Gracia)\nFecha: 2024-06-01\nLicencia: MIT");
         infoText1.setStyle(estiloText);
 
         vBox.getChildren().addAll(infoLabel, infoLabel1, infoText1);

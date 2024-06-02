@@ -22,9 +22,20 @@ public class CsvFileReader {
     private static final String DELIMITER = ",";
     private static String COLUMNS_EXPECTED = "Ref,Val,Package,PosX,PosY,Rot,Side";
 
+    /**
+     * Recibe la lista con los archivos a abrir, la tabla donde mostrarlos y los
+     * botones para cancelar y guardar.
+     * Comprueba que los archivos sean válidos y que contengan componentes dentro,
+     * si lo son, muestra los componentes de ambos archivos y prepara los botones
+     * para guardar y cancelar
+     * 
+     * @param files
+     * @param componentsTable
+     * @param cancelButton
+     * @param saveButton
+     */
     public static void read(List<File> files, TableView<Components> componentsTable, Button cancelButton,
             Button saveButton) {
-        NotificationController.informationMsg("HOLA!", "Me has mandado dos archivos");
         BufferedReader br = null;
 
         Board board = generateBoard(files.getFirst().getName());
@@ -59,15 +70,12 @@ public class CsvFileReader {
 
         board.setFilesLeft(encounteredException);
 
-        // Aquí es pot cancelar i guardar
         if (MainController.dbConnected) {
             saveButton.setDisable(false);
         }
-
         cancelButton.setDisable(false);
 
         MainController.components = (ArrayList<Components>) board.getComponents();
-        // board.setComponents(MainController.components);
         componentsTable.setItems(FXCollections.<Components>observableArrayList(MainController.components));
         MainController.isModifying = false;
         saveButton.setText("Save");
@@ -79,6 +87,19 @@ public class CsvFileReader {
 
     }
 
+    /**
+     * Recibe el archivo a abrir, la placa a la que pertenece (si es null es que es
+     * una nueva placa), la tabla donde mostrar sus componentes y los botones para
+     * cancelar y guardar.
+     * Comprueba que el archivo sea válido y que contengan componentes dentro, si lo
+     * es, los componentes y prepara los botones para guardar y cancelar
+     * 
+     * @param file
+     * @param board
+     * @param componentsTable
+     * @param cancelButton
+     * @param saveButton
+     */
     public static void read(File file, Board board, TableView<Components> componentsTable, Button cancelButton,
             Button saveButton) {
         BufferedReader br = null;
@@ -98,7 +119,6 @@ public class CsvFileReader {
 
             if (br.readLine().trim().equals(COLUMNS_EXPECTED)) {
 
-                // Aquí es pot cancelar i guardar
                 if (MainController.dbConnected) {
                     saveButton.setDisable(false);
                 }
@@ -106,11 +126,9 @@ public class CsvFileReader {
 
                 extractComponents(br, board);
 
-                // board.setComponents(MainController.components);
                 componentsTable.setItems(FXCollections.<Components>observableArrayList(MainController.components));
 
                 if (newBoard && !componentsTable.getItems().isEmpty()) {
-                    // Aquí es pot cancelar i guardar
                     saveButton.setText("Save");
                     MainController.isModifying = false;
                     MainController.originalComponents = new ArrayList<>();
@@ -151,6 +169,13 @@ public class CsvFileReader {
         }
     }
 
+    /**
+     * Extrae los componentes del archivo y los almacena en la placa
+     * 
+     * @param br
+     * @param board
+     * @throws IOException
+     */
     private static void extractComponents(BufferedReader br, Board board) throws IOException {
         String line;
         Components c;
@@ -200,6 +225,12 @@ public class CsvFileReader {
         }
     }
 
+    /**
+     * Crea la placa para poder almacenar los componentes en su lista
+     * 
+     * @param fileName
+     * @return
+     */
     private static Board generateBoard(String fileName) {
         Board board = new Board();
 
