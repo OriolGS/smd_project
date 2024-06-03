@@ -52,7 +52,7 @@ public class TxtFileReader {
                 board.setComponents(MainController.components);
                 componentsTable.setItems(FXCollections.observableArrayList(MainController.components));
                 MainController.isModifying = false;
-                saveButton.setText("Save");
+                saveButton.setText("Guardar");
 
                 MainController.originalComponents = new ArrayList<>();
                 for (Components component : MainController.components) {

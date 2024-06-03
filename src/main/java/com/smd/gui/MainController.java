@@ -183,7 +183,7 @@ public class MainController {
         }
 
         isModifying = true;
-        saveButton.setText("Modify");
+        saveButton.setText("Modificar");
         if (dbConnected) {
             saveButton.setDisable(false);
         }

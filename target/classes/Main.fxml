@@ -18,36 +18,36 @@
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
-        <Menu mnemonicParsing="false" text="File">
+        <Menu mnemonicParsing="false" text="Archivo">
           <items>
-            <MenuItem mnemonicParsing="false" onAction="#handleOpenFile" text="Open…" />
-                  <Menu mnemonicParsing="false" text="Export...">
+            <MenuItem mnemonicParsing="false" onAction="#handleOpenFile" text="Abrir…" />
+                  <Menu mnemonicParsing="false" text="Exportar...">
                     <items>
-                      <MenuItem mnemonicParsing="false" onAction="#setDefaultDirectory" text="set directory" />
-                      <MenuItem fx:id="exportToAsq" mnemonicParsing="false" onAction="#exportToAsq" text="to .asq" />
-                      <MenuItem fx:id="exportToCsv" mnemonicParsing="false" onAction="#exportToCsv" text="to .csv" />
+                      <MenuItem mnemonicParsing="false" onAction="#setDefaultDirectory" text="Seleccionar directorio" />
+                      <MenuItem fx:id="exportToAsq" mnemonicParsing="false" onAction="#exportToAsq" text="a .asq" />
+                      <MenuItem fx:id="exportToCsv" mnemonicParsing="false" onAction="#exportToCsv" text="a .csv" />
                     </items>
                   </Menu>
-            <MenuItem fx:id="printBoard" mnemonicParsing="false" onAction="#printTable" text="Print" />
+            <MenuItem fx:id="printBoard" mnemonicParsing="false" onAction="#printTable" text="Imprimir" />
           </items>
         </Menu>
-        <Menu mnemonicParsing="false" text="Database">
+        <Menu mnemonicParsing="false" text="Base de datos">
           <items>
-                  <MenuItem fx:id="reloadDb" mnemonicParsing="false" onAction="#reloadDb" text="Reload" />
-            <MenuItem mnemonicParsing="false" onAction="#dbConfig" text="Configuration" />
+                  <MenuItem fx:id="reloadDb" mnemonicParsing="false" onAction="#reloadDb" text="Recargar datos" />
+            <MenuItem mnemonicParsing="false" onAction="#dbConfig" text="Configurar base de datos" />
           </items>
         </Menu>
             <Menu mnemonicParsing="false" text="PCB">
               <items>
-                <MenuItem fx:id="centerComponent" mnemonicParsing="false" onAction="#centerOn" text="Center" />
-                <MenuItem fx:id="flipBoard" mnemonicParsing="false" onAction="#flipBoard" text="Flip board" />
+                <MenuItem fx:id="centerComponent" mnemonicParsing="false" onAction="#centerOn" text="Centrar" />
+                <MenuItem fx:id="flipBoard" mnemonicParsing="false" onAction="#flipBoard" text="Girar placa" />
               </items>
             </Menu>
-        <Menu mnemonicParsing="false" text="Help">
+        <Menu mnemonicParsing="false" text="Ayuda">
           <items>
             <MenuItem mnemonicParsing="false" onAction="#helpManual" text="Manual" />
-            <MenuItem mnemonicParsing="false" onAction="#helpTutorials" text="Tutorials" />
-            <MenuItem mnemonicParsing="false" onAction="#helpAbout" text="About" />
+            <MenuItem mnemonicParsing="false" onAction="#helpTutorials" text="Tutoriales" />
+            <MenuItem mnemonicParsing="false" onAction="#helpAbout" text="Acerca de" />
           </items>
         </Menu>
       </menus>
@@ -89,8 +89,8 @@
       </TableView>
       <ButtonBar maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="40.0">
         <buttons>
-          <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#askForCancel" text="Cancel" />
-          <Button fx:id="saveButton" mnemonicParsing="false" onAction="#askBoardName" text="Save" />
+          <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#askForCancel" text="Cancelar" />
+          <Button fx:id="saveButton" mnemonicParsing="false" onAction="#askBoardName" text="Guardar" />
         </buttons>
         <VBox.margin>
             <Insets bottom="5.0" right="5.0" top="5.0" />

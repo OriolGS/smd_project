@@ -78,7 +78,7 @@ public class CsvFileReader {
         MainController.components = (ArrayList<Components>) board.getComponents();
         componentsTable.setItems(FXCollections.<Components>observableArrayList(MainController.components));
         MainController.isModifying = false;
-        saveButton.setText("Save");
+        saveButton.setText("Guardar");
 
         MainController.originalComponents = new ArrayList<>();
         for (Components component : MainController.components) {
@@ -129,14 +129,14 @@ public class CsvFileReader {
                 componentsTable.setItems(FXCollections.<Components>observableArrayList(MainController.components));
 
                 if (newBoard && !componentsTable.getItems().isEmpty()) {
-                    saveButton.setText("Save");
+                    saveButton.setText("Guardar");
                     MainController.isModifying = false;
                     MainController.originalComponents = new ArrayList<>();
                     for (Components component : MainController.components) {
                         MainController.originalComponents.add(new Components(component));
                     }
                 } else if (!newBoard && !componentsTable.getItems().isEmpty()) {
-                    saveButton.setText("Modify");
+                    saveButton.setText("Modificar");
                     MainController.isModifying = true;
                     MainController.originalComponents = new ArrayList<>();
                     for (Components component : MainController.components) {
